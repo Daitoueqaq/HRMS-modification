@@ -1,0 +1,39 @@
+setwd("A:/files")                          
+library(readxl)
+dataset <- read_excel("01302023CID.xlsx")
+CID <- read_excel("01302023CID.xlsx")
+CID1 <- CID[-c(1,2,3,4,5,6),]
+CID2 <- cbind(CID1, empty_column1= NA,empty_column2=NA,empty_column3=NA,empty_column4=NA)
+CID3 <- setNames(CID2, c("mass","intensity","logic","RI","code","name"))
+CID_in <- as.numeric (CID3$intensity)
+log1 <- c(CID_in,0)
+log2 <- c(0,CID_in)
+log3 <- c(CID_in[-1],0,0)
+logic_1 <- ifelse (log1 > log2 & log3 < log1 , 1 , 0)
+n <- length (logic_1)
+logic_2 <- logic_1[1:(n-1)]
+CID3$logic <- logic_2
+max_cid <- max(CID_in)
+RI_1 <- CID_in / max_cid
+CID3$RI <- RI_1
+setwd("C:/Users/boyua/Downloads")
+PFAS_database <- read_excel("PFAS-local-database.xlsx")
+CID4 <- CID3[CID3$logic != 0 ,]
+mass_1 <- as.numeric(CID4$mass)
+setwd("C:/Users/boyua/Downloads")
+Anion_1 <- as.numeric(PFAS_database$Anion_MASS)
+result_1 <- capture.output(
+    for (i in 1:length(mass_1)){
+        for (j in 1:length(Anion_1)){
+            x <- 1000000*(mass_1[i]-Anion_1[j])/Anion_1[j]
+            if (-5 < x & x < 5){
+                print (mass_1[i],
+                       digits=9)
+            }
+        }
+    }
+)
+result_2 <- capture.output (as.data.frame (result_1[!duplicated(result_1)]))
+result_3 <- as.data.frame(gsub("^.{0,24}", "", result_2))
+result_4 <- as.data.frame(result_3[-1,])
+result <- data.frame (anion_mass = result_4[,1])
