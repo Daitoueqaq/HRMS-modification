@@ -155,10 +155,10 @@ Da_9 <- as.data.frame (
         }
     ))
 Data_9 <- setNames(Da_9, "Anion_MASS")
-output <- as.data.frame (cbind (Data_1,Data_2,Data_3,Data_4,Data_5,Data_6,Data_7,Data_8,Data_9))
+output_d <- as.data.frame (cbind (Data_1,Data_2,Data_3,Data_4,Data_5,Data_6,Data_7,Data_8,Data_9))
 output_1 <- as.data.frame (cbind (Data_1,Data_2,Data_3,Data_4,Data_5,Data_6,Data_7,
-                                  as.data.frame(gsub("^.{0,3}", "", output$MONOISOTOPIC_MASS)),
-                                  as.data.frame(gsub("^.{0,3}", "", output$Anion_MASS))))
+                                  as.data.frame(gsub("^.{0,3}", "", output_d$MONOISOTOPIC_MASS)),
+                                  as.data.frame(gsub("^.{0,3}", "", output_d$Anion_MASS))))
 output_2 <- setNames(output_1, c("DTXSID","PREFERRED_NAME","CASRN","INCHIKEY","IUPAC_NAME","SMILES","MOLECULAR_FORMULA","MONOISOTOPIC_MASS","Anion_MASS"))
 output_2$Anion_MASS <- round(as.numeric(output_2$Anion_MASS) ,digit=6)
 combine_2 <- as.data.frame(
