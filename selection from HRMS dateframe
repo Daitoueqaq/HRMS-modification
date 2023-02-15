@@ -19,7 +19,7 @@ RI_1 <- CID_in / max_cid
 CID3$RI <- RI_1
 #Here we input the direction of local database
 setwd("C:/Users/boyua/Downloads")
-PFAS_database <- read_excel("PFAS-local-database.xlsx")
+PFAS_database <- read_excel("PFAS-local-database-modified.xlsx")
 CID4 <- CID3[CID3$logic != 0 ,]
 mass_1 <- as.numeric(CID4$mass)
 setwd("C:/Users/boyua/Downloads")
