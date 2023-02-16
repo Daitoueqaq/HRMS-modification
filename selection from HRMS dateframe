@@ -36,7 +36,7 @@ result_1 <- capture.output(
     }
 )
 result_2 <- capture.output (as.data.frame (result_1[!duplicated(result_1)]))
-result_3 <- as.data.frame(gsub("^.{0,24}", "", result_2))
+result_3 <- as.data.frame(gsub("^.{0,25}", "", result_2))
 result_4 <- as.data.frame(result_3[-1,])
 result_4[] <- lapply(result_4, gsub, pattern=']', replacement='')
 result <- data.frame (anion_mass = result_4[,1])
