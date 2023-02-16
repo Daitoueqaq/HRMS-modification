@@ -109,3 +109,15 @@ RI_1_con3 <- CID_in_con3 / max_cid_con3
 CID_con3_3$RI_con3 <- RI_1_con3
 CID_con3_4 <- CID_con3_3[CID_con3_3$logic != 0 ,]
 
+############algorithm start##############
+result_1 <- capture.output(
+    for (i in 1:length(mass_1)){
+        for (j in 1:length(Anion_1)){
+            x <- 1000000*(mass_1[i]-Anion_1[j])/Anion_1[j]
+            if (-5 < x & x < 5){
+                print (mass_1[i],
+                       digits=9)
+            }
+        }
+    }
+)
