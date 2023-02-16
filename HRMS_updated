@@ -1,0 +1,185 @@
+#Here we input the direction of HRMS data
+setwd("A:/files/Princton_Data/original")                          
+library(readxl)
+#Here we input the name of HRMS data
+dataset <- read_excel("2.xlsx")
+CID <- read_excel("2.xlsx")
+CID1 <- CID[-c(1,2,3,4,5,6,7),]
+CID3 <- setNames(CID1, c("mass","intensity"))
+CID_in <- as.numeric (CID3$intensity)
+log1 <- c(CID_in,0)
+log2 <- c(0,CID_in)
+log3 <- c(CID_in[-1],0,0)
+logic_1 <- ifelse (log1 > log2 & log3 < log1 , 1 , 0)
+n <- length (logic_1)
+logic_2 <- logic_1[1:(n-1)]
+CID3$logic <- logic_2
+max_cid <- max(CID_in)
+RI_1 <- CID_in / max_cid
+CID3$RI <- RI_1
+#Here we input the direction of local database
+setwd("C:/Users/boyua/Downloads")
+PFAS_database <- read_excel("PFAS-local-database-modified.xlsx")
+CID4 <- CID3[CID3$logic != 0 ,]
+mass_1 <- as.numeric(CID4$mass)
+setwd("C:/Users/boyua/Downloads")
+Anion_1 <- as.numeric(PFAS_database$Anion_MASS)
+result_1 <- capture.output(
+    for (i in 1:length(mass_1)){
+        for (j in 1:length(Anion_1)){
+            x <- 1000000*(mass_1[i]-Anion_1[j])/Anion_1[j]
+            if (-5 < x & x < 5){
+                print (mass_1[i],
+                       digits=9)
+            }
+        }
+    }
+)
+result_2 <- capture.output (as.data.frame (result_1[!duplicated(result_1)]))
+result_3 <- as.data.frame(gsub("^.{0,25}", "", result_2))
+result_4 <- as.data.frame(result_3[-1,])
+result_4[] <- lapply(result_4, gsub, pattern=']', replacement='')
+result <- data.frame (anion_mass = result_4[,1])
+options(digits = 10)
+CID4$mass_round <- round(as.numeric(CID4$mass) ,digit=7)
+result_5 <- cbind(result, mass_round = result$anion_mass)
+result_5$mass_round <- round(as.numeric(result_5$mass_round) ,digit=7)
+merged_result_CID <- merge (CID4,result_5,all.x =F)
+Database <- cbind(PFAS_database, mass_round = PFAS_database$Anion_MASS)
+Database$mass_round <- round(as.numeric(Database$mass_round) ,digit=6)
+Da_1 <- as.data.frame (
+    capture.output (
+    for (i in 1:length(merged_result_CID$mass_round)){
+    for (j in 1:length(Database$mass_round)){
+        x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+        if (-5 < x & x < 5){
+            print(Database$DTXSID[j])
+        }
+    }
+    }
+))
+Data_1 <- setNames(Da_1, "DTXSID")
+Da_2 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(Database$PREFERRED_NAME[j])
+                }
+            }
+        }
+    ))
+Data_2 <- setNames(Da_2, "PREFERRED_NAME")
+Da_3 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(Database$CASRN[j])
+                }
+            }
+        }
+    ))
+Data_3 <- setNames(Da_3, "CASRN")
+Da_4 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(Database$INCHIKEY[j])
+                }
+            }
+        }
+    ))
+Data_4 <- setNames(Da_4, "INCHIKEY")
+Da_5 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(Database$IUPAC_NAME[j])
+                }
+            }
+        }
+    ))
+Data_5 <- setNames(Da_5, "IUPAC_NAME")
+Da_6 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(Database$SMILES[j])
+                }
+            }
+        }
+    ))
+Data_6 <- setNames(Da_6, "SMILES")
+Da_7 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(Database$MOLECULAR_FORMULA[j])
+                }
+            }
+        }
+    ))
+Data_7 <- setNames(Da_7, "MOLECULAR_FORMULA")
+Da_8 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(Database$MONOISOTOPIC_MASS[j])
+                }
+            }
+        }
+    ))
+Data_8 <- setNames(Da_8, "MONOISOTOPIC_MASS")
+Da_9 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(Database$Anion_MASS[j])
+                }
+            }
+        }
+    ))
+Data_9 <- setNames(Da_9, "Anion_MASS")
+Da_10 <- as.data.frame (
+    capture.output (
+        for (i in 1:length(merged_result_CID$mass_round)){
+            for (j in 1:length(Database$mass_round)){
+                x <- 1000000*(merged_result_CID$mass_round[i]-Database$mass_round[j])/Database$mass_round[j]
+                if (-5 < x & x < 5){
+                    print(merged_result_CID$mass_round[i])
+                }
+            }
+        }
+    ))
+Data_10 <- setNames(Da_10, "measure_mass")
+output_d <- as.data.frame (cbind (Data_1,Data_2,Data_3,Data_4,Data_5,Data_6,Data_7,Data_8,Data_9,Data_10))
+output_1 <- as.data.frame (cbind (Data_1,Data_2,Data_3,Data_4,Data_5,Data_6,Data_7,
+                                  as.data.frame(gsub("^.{0,3}", "", output_d$MONOISOTOPIC_MASS)),
+                                  as.data.frame(gsub("^.{0,3}", "", output_d$Anion_MASS)),
+                                  as.data.frame(gsub("^.{0,3}", "", output_d$measure_mass))
+                                  ))
+output_2 <- setNames(output_1, c(
+    "DTXSID","PREFERRED_NAME","CASRN","INCHIKEY","IUPAC_NAME","SMILES","MOLECULAR_FORMULA","MONOISOTOPIC_MASS","Theoretical_Anion_MASS","mass_round"))
+output_2$mass_round <- round(as.numeric(output_2$mass_round) ,digit=6)
+output <- merge.data.frame(output_2,merged_result_CID)
+
+#The "output" is the completely matched HRMS data
+#The "merged_result_CID" is the anion mass matched
+
+library("writexl")
+write_xlsx(output,"A:/files/Princton_Data/2.xlsx")
