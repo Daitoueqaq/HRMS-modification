@@ -12,7 +12,7 @@ log2_exp1 <- c(0,CID_in_exp1)
 log3_exp1 <- c(CID_in_exp1[-1],0,0)
 logic_1_exp1 <- ifelse (log1_exp1 > log2_exp1 & log3_exp1 < log1_exp1 , 1 , 0)
 n_exp1 <- length (logic_1_exp1)
-logic_2_exp1 <- logic_1_exp1[1:(n-1)]
+logic_2_exp1 <- logic_1_exp1[1:(n_exp1-1)]
 CID_exp1_3$logic <- logic_2_exp1
 max_cid_exp1 <- max(CID_in_exp1)
 RI_1_exp1 <- CID_in_exp1 / max_cid_exp1
@@ -30,7 +30,7 @@ log2_exp2 <- c(0,CID_in_exp2)
 log3_exp2 <- c(CID_in_exp2[-1],0,0)
 logic_1_exp2 <- ifelse (log1_exp2 > log2_exp2 & log3_exp2 < log1_exp2 , 1 , 0)
 n_exp2 <- length (logic_1_exp2)
-logic_2_exp2 <- logic_1_exp2[1:(n-1)]
+logic_2_exp2 <- logic_1_exp2[1:(n_exp2-1)]
 CID_exp2_3$logic <- logic_2_exp2
 max_cid_exp2 <- max(CID_in_exp2)
 RI_1_exp2 <- CID_in_exp2 / max_cid_exp2
@@ -48,7 +48,7 @@ log2_exp3 <- c(0,CID_in_exp3)
 log3_exp3 <- c(CID_in_exp3[-1],0,0)
 logic_1_exp3 <- ifelse (log1_exp3 > log2_exp3 & log3_exp3 < log1_exp3 , 1 , 0)
 n_exp3 <- length (logic_1_exp3)
-logic_2_exp3 <- logic_1_exp3[1:(n-1)]
+logic_2_exp3 <- logic_1_exp3[1:(n_exp3-1)]
 CID_exp3_3$logic <- logic_2_exp3
 max_cid_exp3 <- max(CID_in_exp3)
 RI_1_exp3 <- CID_in_exp3 / max_cid_exp3
@@ -66,7 +66,7 @@ log2_con1 <- c(0,CID_in_con1)
 log3_con1 <- c(CID_in_con1[-1],0,0)
 logic_1_con1 <- ifelse (log1_con1 > log2_con1 & log3_con1 < log1_con1 , 1 , 0)
 n_con1 <- length (logic_1_con1)
-logic_2_con1 <- logic_1_con1[1:(n-1)]
+logic_2_con1 <- logic_1_con1[1:(n_con1-1)]
 CID_con1_3$logic <- logic_2_con1
 max_cid_con1 <- max(CID_in_con1)
 RI_1_con1 <- CID_in_con1 / max_cid_con1
@@ -84,7 +84,7 @@ log2_con2 <- c(0,CID_in_con2)
 log3_con2 <- c(CID_in_con2[-1],0,0)
 logic_1_con2 <- ifelse (log1_con2 > log2_con2 & log3_con2 < log1_con2 , 1 , 0)
 n_con2 <- length (logic_1_con2)
-logic_2_con2 <- logic_1_con2[1:(n-1)]
+logic_2_con2 <- logic_1_con2[1:(n_con2-1)]
 CID_con2_3$logic <- logic_2_con2
 max_cid_con2 <- max(CID_in_con2)
 RI_1_con2 <- CID_in_con2 / max_cid_con2
@@ -102,9 +102,10 @@ log2_con3 <- c(0,CID_in_con3)
 log3_con3 <- c(CID_in_con3[-1],0,0)
 logic_1_con3 <- ifelse (log1_con3 > log2_con3 & log3_con3 < log1_con3 , 1 , 0)
 n_con3 <- length (logic_1_con3)
-logic_2_con3 <- logic_1_con3[1:(n-1)]
+logic_2_con3 <- logic_1_con3[1:(n_con3-1)]
 CID_con3_3$logic <- logic_2_con3
 max_cid_con3 <- max(CID_in_con3)
 RI_1_con3 <- CID_in_con3 / max_cid_con3
 CID_con3_3$RI_con3 <- RI_1_con3
 CID_con3_4 <- CID_con3_3[CID_con3_3$logic != 0 ,]
+
