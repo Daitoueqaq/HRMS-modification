@@ -55,3 +55,56 @@ RI_1_exp3 <- CID_in_exp3 / max_cid_exp3
 CID_exp3_3$RI_exp3 <- RI_1_exp3
 CID_exp3_4 <- CID_exp3_3[CID_exp3_3$logic != 0 ,]
 
+############input and process first control group##############
+dataset_con1 <- read_excel("2.xlsx")
+CID_con1_1 <- read_excel("2.xlsx")
+CID_con1_2 <- CID_con1_1[-c(1,2,3,4,5,6,7),]
+CID_con1_3 <- setNames(CID_con1_2, c("mass","intensity"))
+CID_in_con1 <- as.numeric (CID_con1_3$intensity)
+log1_con1 <- c(CID_in_con1,0)
+log2_con1 <- c(0,CID_in_con1)
+log3_con1 <- c(CID_in_con1[-1],0,0)
+logic_1_con1 <- ifelse (log1_con1 > log2_con1 & log3_con1 < log1_con1 , 1 , 0)
+n_con1 <- length (logic_1_con1)
+logic_2_con1 <- logic_1_con1[1:(n-1)]
+CID_con1_3$logic <- logic_2_con1
+max_cid_con1 <- max(CID_in_con1)
+RI_1_con1 <- CID_in_con1 / max_cid_con1
+CID_con1_3$RI_con1 <- RI_1_con1
+CID_con1_4 <- CID_con1_3[CID_con1_3$logic != 0 ,]
+
+############input and process second control group##############
+dataset_con2 <- read_excel("2.xlsx")
+CID_con2_1 <- read_excel("2.xlsx")
+CID_con2_2 <- CID_con2_1[-c(1,2,3,4,5,6,7),]
+CID_con2_3 <- setNames(CID_con2_2, c("mass","intensity"))
+CID_in_con2 <- as.numeric (CID_con2_3$intensity)
+log1_con2 <- c(CID_in_con2,0)
+log2_con2 <- c(0,CID_in_con2)
+log3_con2 <- c(CID_in_con2[-1],0,0)
+logic_1_con2 <- ifelse (log1_con2 > log2_con2 & log3_con2 < log1_con2 , 1 , 0)
+n_con2 <- length (logic_1_con2)
+logic_2_con2 <- logic_1_con2[1:(n-1)]
+CID_con2_3$logic <- logic_2_con2
+max_cid_con2 <- max(CID_in_con2)
+RI_1_con2 <- CID_in_con2 / max_cid_con2
+CID_con2_3$RI_con2 <- RI_1_con2
+CID_con2_4 <- CID_con2_3[CID_con2_3$logic != 0 ,]
+
+############input and process third control group##############
+dataset_exp3 <- read_excel("2.xlsx")
+CID_exp3_1 <- read_excel("2.xlsx")
+CID_exp3_2 <- CID_exp3_1[-c(1,2,3,4,5,6,7),]
+CID_exp3_3 <- setNames(CID_exp3_2, c("mass","intensity"))
+CID_in_exp3 <- as.numeric (CID_exp3_3$intensity)
+log1_exp3 <- c(CID_in_exp3,0)
+log2_exp3 <- c(0,CID_in_exp3)
+log3_exp3 <- c(CID_in_exp3[-1],0,0)
+logic_1_exp3 <- ifelse (log1_exp3 > log2_exp3 & log3_exp3 < log1_exp3 , 1 , 0)
+n_exp3 <- length (logic_1_exp3)
+logic_2_exp3 <- logic_1_exp3[1:(n-1)]
+CID_exp3_3$logic <- logic_2_exp3
+max_cid_exp3 <- max(CID_in_exp3)
+RI_1_exp3 <- CID_in_exp3 / max_cid_exp3
+CID_exp3_3$RI_exp3 <- RI_1_exp3
+CID_exp3_4 <- CID_exp3_3[CID_exp3_3$logic != 0 ,]
