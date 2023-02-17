@@ -109,13 +109,33 @@ RI_1_con3 <- CID_in_con3 / max_cid_con3
 CID_con3_3$RI_con3 <- RI_1_con3
 CID_con3_4 <- CID_con3_3[CID_con3_3$logic != 0 ,]
 
+mass_exp1 <- as.numeric(CID_exp1_4$mass)
+mass_exp2 <- as.numeric(CID_exp2_4$mass)
+mass_exp3 <- as.numeric(CID_exp3_4$mass)
+mass_con1 <- as.numeric(CID_con1_4$mass)
+mass_con2 <- as.numeric(CID_con2_4$mass)
+mass_con3 <- as.numeric(CID_con3_4$mass)
+
 ############algorithm start##############
-result_1 <- capture.output(
-    for (i in 1:length(mass_1)){
-        for (j in 1:length(Anion_1)){
-            x <- 1000000*(mass_1[i]-Anion_1[j])/Anion_1[j]
-            if (-5 < x & x < 5){
-                print (mass_1[i],
+massfit_exp <- capture.output(
+    for (i in 1:length(mass_exp1)){
+        for (j in 1:length(mass_exp2)){
+            for (k in 1:length(mass_exp3)){
+                x <- 1000000*(mass_exp1[i]-mass_exp2[j])/mass_exp1[i]
+                y <- 1000000*(mass_exp1[i]-mass_exp3[k])/mass_exp1[i]
+                z <- 1000000*(mass_exp2[j]-mass_exp3[k])/mass_exp2[j]
+                      xx <- 1000000*(mass_exp1[i]-mass_exp2[j])/mass_exp1[j]
+                      yy <- 1000000*(mass_exp1[i]-mass_exp3[k])/mass_exp1[k]
+                      zz <- 1000000*(mass_exp2[j]-mass_exp3[k])/mass_exp2[k]
+            }
+            if (-25 < x & x < 25
+                -25 < y & y < 25
+                -25 < z & z < 25
+                -25 < xx & xx < 25
+                -25 < yy & yy < 25
+                -25 < zz & zz < 25
+                ){
+                print (mass_exp1[i],
                        digits=9)
             }
         }
