@@ -123,41 +123,48 @@ exp1$num1 <- as.numeric(exp1$num1)
 exp2$num2 <- as.numeric(exp2$num2)
 exp3$num3 <- as.numeric(exp3$num3)
 
+#################################For_one_group#########################################################
+library(progress)
 percent_diff <- function(x, y, pct_diff) {
-    abs((x - y) / y) <= pct_diff / 100
+  abs((x - y) / y) <= pct_diff / 100
 }
 matched_values <- c()
+pb <- progress_bar$new(total = length(exp1$num1))
 for (i in 1:length(exp1$num1)) {
     match1 <- exp2$num2[apply(exp2, 1, percent_diff, y = exp1$num1[i], pct_diff = 0.0005)]
     match2 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp1$num1[i], pct_diff = 0.0005)]
     if (length(match1) > 0 | length(match2) > 0) {
-        matched_values <- c(matched_values, exp1$num1[i])
-    }
+          matched_values <- c(matched_values, exp1$num1[i])
+  }
+  pb$tick()
 }
+
 matched_df <- data.frame(matched_values)
 
-############algorithm start##############
-massfit_exp <- capture.output(
-    for (i in 1:length(mass_exp1)){
-        for (j in 1:length(mass_exp2)){
-            for (k in 1:length(mass_exp3)){
-                x <- 1000000*(mass_exp1[i]-mass_exp2[j])/mass_exp1[i]
-                y <- 1000000*(mass_exp1[i]-mass_exp3[k])/mass_exp1[i]
-                z <- 1000000*(mass_exp2[j]-mass_exp3[k])/mass_exp2[j]
-                      xx <- 1000000*(mass_exp1[i]-mass_exp2[j])/mass_exp1[j]
-                      yy <- 1000000*(mass_exp1[i]-mass_exp3[k])/mass_exp1[k]
-                      zz <- 1000000*(mass_exp2[j]-mass_exp3[k])/mass_exp2[k]
-            }
-            if (-25 < x & x < 25
-                -25 < y & y < 25
-                -25 < z & z < 25
-                -25 < xx & xx < 25
-                -25 < yy & yy < 25
-                -25 < zz & zz < 25
-                ){
-                print (mass_exp1[i],
-                       digits=9)
-            }
-        }
+#############################Multaple_group##########################################################
+
+percent_diff <- function(x, y, pct_diff) {
+    abs((x - y) / y) <= pct_diff / 1000000
+}
+
+matched_df <- data.frame(value = numeric(), dataframe = character())
+
+for (i in 1:length(dataframe1$values1)) {
+    
+    match2 <- exp2$num2[apply(exp2, 1, percent_diff, y = exp1$num1[i], pct_diff = 5)]
+    match3 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp1$num1[i], pct_diff = 5)]
+    if (length(match2) > 0 & length(match3) > 0) {
+        matched_df <- rbind(matched_df, data.frame(value = exp1$num1[i], dataframe = "exp1"))
     }
-)
+    match1 <- exp1$num1[apply(exp1, 1, percent_diff, y = exp2$num2[i], pct_diff = 5)]
+    match3 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp2$num2[i], pct_diff = 5)]
+    if (length(match1) > 0 & length(match3) > 0) {
+        matched_df <- rbind(matched_df, data.frame(value = exp2$num2[i], dataframe = "exp2"))
+    }
+    match1 <- exp1$num1[apply(exp1, 1, percent_diff, y = exp3$num3[i], pct_diff = 5)]
+    match2 <- exp2$num2[apply(exp2, 1, percent_diff, y = exp3$num3[i], pct_diff = 5)]
+    if (length(match1) > 0 & length(match2) > 0) {
+        matched_df <- rbind(matched_df, data.frame(value = exp3$num3[i], dataframe = "exp3"))
+    }
+    cat(paste0("Progress: ", i, "/", length(exp1$num1), "\n"))
+}
