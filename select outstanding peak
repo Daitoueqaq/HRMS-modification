@@ -123,6 +123,13 @@ exp1$num1 <- as.numeric(exp1$num1)
 exp2$num2 <- as.numeric(exp2$num2)
 exp3$num3 <- as.numeric(exp3$num3)
 
+con1 <- data.frame(num1 = CID_con1_4$mass)
+con2 <- data.frame(num2 = CID_con2_4$mass)
+con3 <- data.frame(num3 = CID_con3_4$mass)
+con1$num1 <- as.numeric(con1$num1)
+con2$num2 <- as.numeric(con2$num2)
+con3$num3 <- as.numeric(con3$num3)
+
 #################################For_one_group#########################################################
 library(progress)
 percent_diff <- function(x, y, pct_diff) {
@@ -147,24 +154,49 @@ percent_diff <- function(x, y, pct_diff) {
     abs((x - y) / y) <= pct_diff / 1000000
 }
 
-matched_df <- data.frame(value = numeric(), dataframe = character())
+matched_exp_df <- data.frame(value = numeric(), dataframe = character())
+matched_con_df <- data.frame(value = numeric(), dataframe = character())
 
-for (i in 1:length(dataframe1$values1)) {
+for (i in 1:length(exp1$num1)) {
     
     match2 <- exp2$num2[apply(exp2, 1, percent_diff, y = exp1$num1[i], pct_diff = 5)]
     match3 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp1$num1[i], pct_diff = 5)]
     if (length(match2) > 0 & length(match3) > 0) {
-        matched_df <- rbind(matched_df, data.frame(value = exp1$num1[i], dataframe = "exp1"))
+        matched_exp_df <- rbind(matched_exp_df, data.frame(value1 = exp1$num1[i], value2 = match2, value3 = match3))
     }
     match1 <- exp1$num1[apply(exp1, 1, percent_diff, y = exp2$num2[i], pct_diff = 5)]
     match3 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp2$num2[i], pct_diff = 5)]
     if (length(match1) > 0 & length(match3) > 0) {
-        matched_df <- rbind(matched_df, data.frame(value = exp2$num2[i], dataframe = "exp2"))
+        matched_exp_df <- rbind(matched_exp_df, data.frame(value1 = match1, value2 = exp2$num2[i], value3 = match3))
     }
     match1 <- exp1$num1[apply(exp1, 1, percent_diff, y = exp3$num3[i], pct_diff = 5)]
     match2 <- exp2$num2[apply(exp2, 1, percent_diff, y = exp3$num3[i], pct_diff = 5)]
     if (length(match1) > 0 & length(match2) > 0) {
-        matched_df <- rbind(matched_df, data.frame(value = exp3$num3[i], dataframe = "exp3"))
+        matched_exp_df <- rbind(matched_exp_df, data.frame(value1 = match1, value2 = match2, value3 = exp3$num3[i]))
     }
     cat(paste0("Progress: ", i, "/", length(exp1$num1), "\n"))
 }
+
+merged_exp <- unique (matched_exp_df)
+
+for (i in 1:length(con1$num1)) {
+    
+    match2 <- con2$num2[apply(con2, 1, percent_diff, y = con1$num1[i], pct_diff = 5)]
+    match3 <- con3$num3[apply(con3, 1, percent_diff, y = con1$num1[i], pct_diff = 5)]
+    if (length(match2) > 0 & length(match3) > 0) {
+        matched_con_df <- rbind(matched_con_df, data.frame(value1 = con1$num1[i], value2 = match2, value3 = match3))
+    }
+    match1 <- con1$num1[apply(con1, 1, percent_diff, y = con2$num2[i], pct_diff = 5)]
+    match3 <- con3$num3[apply(con3, 1, percent_diff, y = con2$num2[i], pct_diff = 5)]
+    if (length(match1) > 0 & length(match3) > 0) {
+        matched_con_df <- rbind(matched_con_df, data.frame(value1 = match1, value2 = con2$num2[i], value3 = match3))
+    }
+    match1 <- con1$num1[apply(con1, 1, percent_diff, y = con3$num3[i], pct_diff = 5)]
+    match2 <- con2$num2[apply(con2, 1, percent_diff, y = con3$num3[i], pct_diff = 5)]
+    if (length(match1) > 0 & length(match2) > 0) {
+        matched_con_df <- rbind(matched_con_df, data.frame(value1 = match1, value2 = match2, value3 = con3$num3[i]))
+    }
+    cat(paste0("Progress: ", i, "/", length(exp1$num1), "\n"))
+}
+
+merged_con <- unique (matched_con_df)
