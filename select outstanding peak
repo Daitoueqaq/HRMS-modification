@@ -144,9 +144,9 @@ for (i in 1:length(exp1$num1)) {
           matched_values <- c(matched_values, exp1$num1[i])
   }
   pb$tick()
-}
+  }
 
-matched_df <- data.frame(matched_values)
+ matched_df <- data.frame(matched_values)
 
 #############################Multaple_group##########################################################
 
@@ -179,6 +179,10 @@ for (i in 1:length(exp1$num1)) {
 
 merged_exp <- unique (matched_exp_df)
 
+percent_diff <- function(x, y, pct_diff) {
+    abs((x - y) / y) <= pct_diff / 1000000
+}
+
 for (i in 1:length(con1$num1)) {
     
     matchc2 <- con2$num2[apply(con2, 1, percent_diff, y = con1$num1[i], pct_diff = 5)]
@@ -200,3 +204,43 @@ for (i in 1:length(con1$num1)) {
 }
 
 merged_con <- unique (matched_con_df)
+
+####################################################################################################################
+library(progress)
+percent_diff <- function(x, y, pct_diff) {
+  abs((x - y) / y) <= pct_diff / 1000000
+}
+matched_values_1_2 <- c()
+matched_values_1_3 <- c()
+matched_values_2_2 <- c()
+
+pb12 <- progress_bar$new(total = length(exp1$num1))
+pb13 <- progress_bar$new(total = length(exp1$num1))
+pb23 <- progress_bar$new(total = length(exp2$num2))
+
+for (i in 1:length(exp1$num1)) {
+    match1_2 <- exp2$num2[apply(exp2, 1, percent_diff, y = exp1$num1[i], pct_diff = 5)]
+    if (length(match1_2) > 0) {
+          matched_values_1_2 <- c(matched_values, exp1$num1[i])
+  }
+  pb12$tick()
+  }
+mathced_df_1_2 <- data.frame(matched_values_1_2)
+
+for (i in 1:length(exp1$num1)) {
+    match1_3 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp1$num1[i], pct_diff = 5)]
+    if (length(match1_3) > 0) {
+          matched_values_1_3 <- c(matched_values, exp1$num1[i])
+  }
+  pb13$tick()
+  }
+mathced_df_1_3 <- data.frame(matched_values_1_3)
+
+for (i in 1:length(exp1$num1)) {
+    match2_3 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp2$num2[i], pct_diff = 5)]
+    if (length(match2_3) > 0) {
+          matched_values_2_3 <- c(matched_values, exp2$num2[i])
+  }
+  pb23$tick()
+  }
+mathced_df_2_3 <- data.frame(matched_values_2_3)
