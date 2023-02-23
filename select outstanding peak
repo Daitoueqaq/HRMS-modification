@@ -1,4 +1,4 @@
-setwd("A:/files/Princton_Data/original")                          
+setwd("A:/files/Princton_Data/test_data")                          
 library(readxl)
 
 ############input and process first experimental group##############
@@ -115,6 +115,26 @@ mass_exp3 <- as.numeric(CID_exp3_4$mass)
 mass_con1 <- as.numeric(CID_con1_4$mass)
 mass_con2 <- as.numeric(CID_con2_4$mass)
 mass_con3 <- as.numeric(CID_con3_4$mass)
+
+exp1 <- data.frame(num1 = CID_exp1_4$mass)
+exp2 <- data.frame(num2 = CID_exp2_4$mass)
+exp3 <- data.frame(num3 = CID_exp3_4$mass)
+exp1$num1 <- as.numeric(exp1$num1)
+exp2$num2 <- as.numeric(exp2$num2)
+exp3$num3 <- as.numeric(exp3$num3)
+
+percent_diff <- function(x, y, pct_diff) {
+    abs((x - y) / y) <= pct_diff / 100
+}
+matched_values <- c()
+for (i in 1:length(exp1$num1)) {
+    match1 <- exp2$num2[apply(exp2, 1, percent_diff, y = exp1$num1[i], pct_diff = 0.0005)]
+    match2 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp1$num1[i], pct_diff = 0.0005)]
+    if (length(match1) > 0 | length(match2) > 0) {
+        matched_values <- c(matched_values, exp1$num1[i])
+    }
+}
+matched_df <- data.frame(matched_values)
 
 ############algorithm start##############
 massfit_exp <- capture.output(
