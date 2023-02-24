@@ -1,0 +1,46 @@
+import pandas as pd
+
+# Set working directory
+import os
+os.chdir("A:/files/Princton_Data/test_data")
+
+# Input and process first experimental group
+dataset_exp1 = pd.read_excel("e1.xlsx")
+CID_exp1_1 = pd.read_excel("e1.xlsx")
+CID_exp1_2 = CID_exp1_1.drop(CID_exp1_1.index[[0,1,2,3,4,5,6]])
+CID_exp1_3 = CID_exp1_2.rename(columns={"X1": "mass", "X2": "intensity"})
+CID_in_exp1 = CID_exp1_3["intensity"].astype(float)
+log1_exp1 = pd.concat([CID_in_exp1, pd.Series([0])])
+log2_exp1 = pd.concat([pd.Series([0]), CID_in_exp1])
+log3_exp1 = pd.concat([CID_in_exp1.iloc[1:], pd.Series([0,0])])
+logic_1_exp1 = pd.Series((log1_exp1 > log2_exp1) & (log3_exp1 < log1_exp1)).replace({True: 1, False: 0})
+n_exp1 = len(logic_1_exp1)
+logic_2_exp1 = logic_1_exp1.iloc[:n_exp1-1]
+CID_exp1_3["logic"] = logic_2_exp1.reset_index(drop=True)
+max_cid_exp1 = CID_in_exp1.max()
+RI_1_exp1 = CID_in_exp1 / max_cid_exp1
+CID_exp1_3["RI_exp1"] = RI_1_exp1.reset_index(drop=True)
+CID_exp1_4 = CID_exp1_3[CID_exp1_3["logic"] != 0]
+
+# Input and process second experimental group
+dataset_exp2 = pd.read_excel("e2.xlsx")
+CID_exp2_1 = pd.read_excel("e2.xlsx")
+CID_exp2_2 = CID_exp2_1.drop(CID_exp2_1.index[[0,1,2,3,4,5,6]])
+CID_exp2_3 = CID_exp2_2.rename(columns={"X1": "mass", "X2": "intensity"})
+CID_in_exp2 = CID_exp2_3["intensity"].astype(float)
+log1_exp2 = pd.concat([CID_in_exp2, pd.Series([0])])
+log2_exp2 = pd.concat([pd.Series([0]), CID_in_exp2])
+log3_exp2 = pd.concat([CID_in_exp2.iloc[1:], pd.Series([0,0])])
+logic_1_exp2 = pd.Series((log1_exp2 > log2_exp2) & (log3_exp2 < log1_exp2)).replace({True: 1, False: 0})
+n_exp2 = len(logic_1_exp2)
+logic_2_exp2 = logic_1_exp2.iloc[:n_exp2-1]
+CID_exp2_3["logic"] = logic_2_exp2.reset_index(drop=True)
+max_cid_exp2 = CID_in_exp2.max()
+RI_1_exp2 = CID_in_exp2 / max_cid_exp2
+CID_exp2_3["RI_exp2"] = RI_1_exp2.reset_index(drop=True)
+CID_exp2_4 = CID_exp2_3[CID_exp2_3["logic"] != 0]
+
+# Input and process third experimental group
+dataset_exp3 = pd.read_excel("e3.xlsx")
+CID_exp3_1 = pd.read_excel("e3.xlsx")
+CID_exp3_2 = CID_exp3_1.drop
