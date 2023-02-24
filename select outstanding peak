@@ -206,41 +206,211 @@ for (i in 1:length(con1$num1)) {
 merged_con <- unique (matched_con_df)
 
 ####################################################################################################################
-library(progress)
-percent_diff <- function(x, y, pct_diff) {
-  abs((x - y) / y) <= pct_diff / 1000000
+
+matched_exp1_from12 <- data.frame(value = numeric())
+matched_exp2_from12 <- data.frame(value = numeric())
+
+for (i in 1:nrow(exp1)) {
+    percent_diff <- abs((exp2 - exp1[i,]) / ((exp2 + exp1[i,]) / 2)) 
+    
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matched_values <- exp2[within_range,]
+        matched_exp2_from12 <- rbind(matched_exp2_from12, data.frame(value = matched_values))
+    }
+    
+    within_range <- percent_diff <= 0.000005
+    
+    if (sum(within_range) > 0) {
+        matched_values <- exp1[i,]
+        matched_exp1_from12 <- rbind(matched_exp1_from12, data.frame(value = matched_values))
+    }
 }
-matched_values_1_2 <- c()
-matched_values_1_3 <- c()
-matched_values_2_2 <- c()
 
-pb12 <- progress_bar$new(total = length(exp1$num1))
-pb13 <- progress_bar$new(total = length(exp1$num1))
-pb23 <- progress_bar$new(total = length(exp2$num2))
+matched_exp1_exp2 <- data.frame(value_exp1 = numeric(), value_exp2 = numeric())
 
-for (i in 1:length(exp1$num1)) {
-    match1_2 <- exp2$num2[apply(exp2, 1, percent_diff, y = exp1$num1[i], pct_diff = 5)]
-    if (length(match1_2) > 0) {
-          matched_values_1_2 <- c(matched_values, exp1$num1[i])
-  }
-  pb12$tick()
-  }
-mathced_df_1_2 <- data.frame(matched_values_1_2)
+for (i in 1:nrow(exp2)) {
+    percent_diff <- abs((exp1 - exp2[i,]) / ((exp1 + exp2[i,]) / 2)) 
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matching_values <- data.frame(value_exp1 = exp1[within_range,], 
+                                      value_exp2 = rep(exp2[i,], length(within_range)))
+        matched_exp1_exp2 <- rbind(matched_exp1_exp2, matching_values)
+    }
+}
 
-for (i in 1:length(exp1$num1)) {
-    match1_3 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp1$num1[i], pct_diff = 5)]
-    if (length(match1_3) > 0) {
-          matched_values_1_3 <- c(matched_values, exp1$num1[i])
-  }
-  pb13$tick()
-  }
-mathced_df_1_3 <- data.frame(matched_values_1_3)
 
-for (i in 1:length(exp1$num1)) {
-    match2_3 <- exp3$num3[apply(exp3, 1, percent_diff, y = exp2$num2[i], pct_diff = 5)]
-    if (length(match2_3) > 0) {
-          matched_values_2_3 <- c(matched_values, exp2$num2[i])
-  }
-  pb23$tick()
-  }
-mathced_df_2_3 <- data.frame(matched_values_2_3)
+matched_exp1_from13 <- data.frame(value = numeric())
+matched_exp3_from13 <- data.frame(value = numeric())
+
+for (i in 1:nrow(exp1)) {
+    percent_diff <- abs((exp3 - exp1[i,]) / ((exp3 + exp1[i,]) / 2)) 
+    
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matched_values <- exp3[within_range,]
+        matched_exp3_from13 <- rbind(matched_exp3_from13, data.frame(value = matched_values))
+    }
+    
+    within_range <- percent_diff <= 0.000005
+    
+    if (sum(within_range) > 0) {
+        matched_values <- exp1[i,]
+        matched_exp1_from13 <- rbind(matched_exp1_from13, data.frame(value = matched_values))
+    }
+}
+
+matched_exp1_exp3 <- data.frame(value_exp1 = numeric(), value_exp3 = numeric())
+
+for (i in 1:nrow(exp3)) {
+    percent_diff <- abs((exp1 - exp3[i,]) / ((exp1 + exp3[i,]) / 2)) 
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matching_values <- data.frame(value_exp1 = exp1[within_range,], 
+                                      value_exp3 = rep(exp3[i,], length(within_range)))
+        matched_exp1_exp3 <- rbind(matched_exp1_exp3, matching_values)
+    }
+}
+
+
+matched_exp2_from23 <- data.frame(value = numeric())
+matched_exp3_from23 <- data.frame(value = numeric())
+
+for (i in 1:nrow(exp1)) {
+    percent_diff <- abs((exp3 - exp2[i,]) / ((exp3 + exp2[i,]) / 2)) 
+    
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matched_values <- exp3[within_range,]
+        matched_exp3_from23 <- rbind(matched_exp3_from23, data.frame(value = matched_values))
+    }
+    
+    within_range <- percent_diff <= 0.000005
+    
+    if (sum(within_range) > 0) {
+        matched_values <- exp2[i,]
+        matched_exp2_from23 <- rbind(matched_exp2_from23, data.frame(value = matched_values))
+    }
+}
+
+matched_exp2_exp3 <- data.frame(value_exp2 = numeric(), value_exp3 = numeric())
+
+for (i in 1:nrow(exp3)) {
+    percent_diff <- abs((exp2 - exp3[i,]) / ((exp2 + exp3[i,]) / 2)) 
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matching_values <- data.frame(value_exp2 = exp1[within_range,], 
+                                      value_exp3 = rep(exp3[i,], length(within_range)))
+        matched_exp2_exp3 <- rbind(matched_exp2_exp3, matching_values)
+    }
+}
+
+matched_con1_from12 <- data.frame(value = numeric())
+matched_con2_from12 <- data.frame(value = numeric())
+
+for (i in 1:nrow(con1)) {
+    percent_diff <- abs((con2 - con1[i,]) / ((con2 + con1[i,]) / 2)) 
+    
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matched_values <- con2[within_range,]
+        matched_con2_from12 <- rbind(matched_con2_from12, data.frame(value = matched_values))
+    }
+    
+    within_range <- percent_diff <= 0.000005
+    
+    if (sum(within_range) > 0) {
+        matched_values <- con1[i,]
+        matched_con1_from12 <- rbind(matched_con1_from12, data.frame(value = matched_values))
+    }
+}
+
+matched_con1_con2 <- data.frame(value_con1 = numeric(), value_con2 = numeric())
+
+for (i in 1:nrow(con2)) {
+    percent_diff <- abs((con1 - con2[i,]) / ((con1 + con2[i,]) / 2)) 
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matching_values <- data.frame(value_con1 = con1[within_range,], 
+                                      value_con2 = rep(con2[i,], length(within_range)))
+        matched_con1_con2 <- rbind(matched_con1_con2, matching_values)
+    }
+}
+
+
+matched_con1_from13 <- data.frame(value = numeric())
+matched_con3_from13 <- data.frame(value = numeric())
+
+for (i in 1:nrow(con1)) {
+    percent_diff <- abs((con3 - con1[i,]) / ((con3 + con1[i,]) / 2)) 
+    
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matched_values <- con3[within_range,]
+        matched_con3_from13 <- rbind(matched_con3_from13, data.frame(value = matched_values))
+    }
+    
+    within_range <- percent_diff <= 0.000005
+    
+    if (sum(within_range) > 0) {
+        matched_values <- con1[i,]
+        matched_con1_from13 <- rbind(matched_con1_from13, data.frame(value = matched_values))
+    }
+}
+
+matched_con1_con3 <- data.frame(value_con1 = numeric(), value_con3 = numeric())
+
+for (i in 1:nrow(con3)) {
+    percent_diff <- abs((con1 - con3[i,]) / ((con1 + con3[i,]) / 2)) 
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matching_values <- data.frame(value_con1 = con1[within_range,], 
+                                      value_con3 = rep(con3[i,], length(within_range)))
+        matched_con1_con3 <- rbind(matched_con1_con3, matching_values)
+    }
+}
+
+
+matched_con2_from23 <- data.frame(value = numeric())
+matched_con3_from23 <- data.frame(value = numeric())
+
+for (i in 1:nrow(con1)) {
+    percent_diff <- abs((con3 - con2[i,]) / ((con3 + con2[i,]) / 2)) 
+    
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matched_values <- con3[within_range,]
+        matched_con3_from23 <- rbind(matched_con3_from23, data.frame(value = matched_values))
+    }
+    
+    within_range <- percent_diff <= 0.000005
+    
+    if (sum(within_range) > 0) {
+        matched_values <- con2[i,]
+        matched_con2_from23 <- rbind(matched_con2_from23, data.frame(value = matched_values))
+    }
+}
+
+matched_con2_con3 <- data.frame(value_con2 = numeric(), value_con3 = numeric())
+
+for (i in 1:nrow(con3)) {
+    percent_diff <- abs((con2 - con3[i,]) / ((con2 + con3[i,]) / 2)) 
+    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
+    
+    if (length(within_range) > 0) {
+        matching_values <- data.frame(value_con2 = con1[within_range,], 
+                                      value_con3 = rep(con3[i,], length(within_range)))
+        matched_con2_con3 <- rbind(matched_con2_con3, matching_values)
+    }
+}
