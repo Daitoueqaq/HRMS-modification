@@ -384,7 +384,7 @@ for (i in 1:nrow(con3)) {
 matched_con2_from23 <- data.frame(value = numeric())
 matched_con3_from23 <- data.frame(value = numeric())
 
-for (i in 1:nrow(con1)) {
+for (i in 1:nrow(con2)) {
     percent_diff <- abs((con3 - con2[i,]) / ((con3 + con2[i,]) / 2)) 
     
     within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
