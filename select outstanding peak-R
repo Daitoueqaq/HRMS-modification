@@ -409,7 +409,7 @@ for (i in 1:nrow(con3)) {
     within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
     
     if (length(within_range) > 0) {
-        matching_values <- data.frame(value_con2 = con1[within_range,], 
+        matching_values <- data.frame(value_con2 = con2[within_range,], 
                                       value_con3 = rep(con3[i,], length(within_range)))
         matched_con2_con3 <- rbind(matched_con2_con3, matching_values)
     }
