@@ -280,7 +280,7 @@ for (i in 1:nrow(exp3)) {
 matched_exp2_from23 <- data.frame(value = numeric())
 matched_exp3_from23 <- data.frame(value = numeric())
 
-for (i in 1:nrow(exp1)) {
+for (i in 1:nrow(exp2)) {
     percent_diff <- abs((exp3 - exp2[i,]) / ((exp3 + exp2[i,]) / 2)) 
     
     within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
@@ -305,7 +305,7 @@ for (i in 1:nrow(exp3)) {
     within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
     
     if (length(within_range) > 0) {
-        matching_values <- data.frame(value_exp2 = exp1[within_range,], 
+        matching_values <- data.frame(value_exp2 = exp2[within_range,], 
                                       value_exp3 = rep(exp3[i,], length(within_range)))
         matched_exp2_exp3 <- rbind(matched_exp2_exp3, matching_values)
     }
