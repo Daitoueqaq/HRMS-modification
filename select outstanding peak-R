@@ -439,3 +439,40 @@ con_merged$value_con1_sort <- ifelse(is.na(con_merged$value_con1), con_merged$va
 con_merged <- con_merged[order(con_merged$value_con1_sort), ]
 con_merged$value_con1_sort <- NULL
 
+
+names(CID_exp1_4) <- c("value_exp1", "Intensity_exp1", "logic_exp1","RI_exp1")
+options(digits=8)
+exp1_modified <- data.frame(value_exp1 = CID_exp1_4$value_exp1,Intensity_exp1 = CID_exp1_4$Intensity_exp1,RI_exp1 = CID_exp1_4$RI_exp1)
+exp1_modified$value_exp1 <- as.numeric(exp1_modified$value_exp1)
+exp_merged_1 <- merge(exp_merged, exp1_modified, by="value_exp1", all.x = TRUE)
+
+names(CID_exp2_4) <- c("value_exp2", "Intensity_exp2", "logic_exp2","RI_exp2")
+options(digits=8)
+exp2_modified <- data.frame(value_exp2 = CID_exp2_4$value_exp2,Intensity_exp2 = CID_exp2_4$Intensity_exp2,RI_exp2 = CID_exp2_4$RI_exp2)
+exp2_modified$value_exp2 <- as.numeric(exp2_modified$value_exp2)
+exp_merged_1_2 <- merge(exp_merged_1, exp2_modified, by="value_exp2", all.x = TRUE)
+
+names(CID_exp3_4) <- c("value_exp3", "Intensity_exp3", "logic_exp3","RI_exp3")
+options(digits=8)
+exp3_modified <- data.frame(value_exp3 = CID_exp3_4$value_exp3,Intensity_exp3 = CID_exp3_4$Intensity_exp3,RI_exp3 = CID_exp3_4$RI_exp3)
+exp3_modified$value_exp3 <- as.numeric(exp3_modified$value_exp3)
+exp_merged_1_2_3 <- merge(exp_merged_1_2, exp3_modified, by="value_exp3", all.x = TRUE)
+
+
+names(CID_con1_4) <- c("value_con1", "Intensity_con1", "logic_con1","RI_con1")
+options(digits=8)
+con1_modified <- data.frame(value_con1 = CID_con1_4$value_con1,Intensity_con1 = CID_con1_4$Intensity_con1,RI_con1 = CID_con1_4$RI_con1)
+con1_modified$value_con1 <- as.numeric(con1_modified$value_con1)
+con_merged_1 <- merge(con_merged, con1_modified, by="value_con1", all.x = TRUE)
+
+names(CID_con2_4) <- c("value_con2", "Intensity_con2", "logic_con2","RI_con2")
+options(digits=8)
+con2_modified <- data.frame(value_con2 = CID_con2_4$value_con2,Intensity_con2 = CID_con2_4$Intensity_con2,RI_con2 = CID_con2_4$RI_con2)
+con2_modified$value_con2 <- as.numeric(con2_modified$value_con2)
+con_merged_1_2 <- merge(con_merged_1, con2_modified, by="value_con2", all.x = TRUE)
+
+names(CID_con3_4) <- c("value_con3", "Intensity_con3", "logic_con3","RI_con3")
+options(digits=8)
+con3_modified <- data.frame(value_con3 = CID_con3_4$value_con3,Intensity_con3 = CID_con3_4$Intensity_con3,RI_con3 = CID_con3_4$RI_con3)
+con3_modified$value_con3 <- as.numeric(con3_modified$value_con3)
+con_merged_1_2_3 <- merge(con_merged_1_2, con3_modified, by="value_con3", all.x = TRUE)
