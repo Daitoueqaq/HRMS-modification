@@ -109,13 +109,8 @@ RI_1_con3 <- CID_in_con3 / max_cid_con3
 CID_con3_3$RI_con3 <- RI_1_con3
 CID_con3_4 <- CID_con3_3[CID_con3_3$logic != 0 ,]
 
-mass_exp1 <- as.numeric(CID_exp1_4$mass)
-mass_exp2 <- as.numeric(CID_exp2_4$mass)
-mass_exp3 <- as.numeric(CID_exp3_4$mass)
-mass_con1 <- as.numeric(CID_con1_4$mass)
-mass_con2 <- as.numeric(CID_con2_4$mass)
-mass_con3 <- as.numeric(CID_con3_4$mass)
 
+options(digits=8)
 exp1 <- data.frame(num1 = CID_exp1_4$mass)
 exp2 <- data.frame(num2 = CID_exp2_4$mass)
 exp3 <- data.frame(num3 = CID_exp3_4$mass)
@@ -123,6 +118,7 @@ exp1$num1 <- as.numeric(exp1$num1)
 exp2$num2 <- as.numeric(exp2$num2)
 exp3$num3 <- as.numeric(exp3$num3)
 
+options(digits=8)
 con1 <- data.frame(num1 = CID_con1_4$mass)
 con2 <- data.frame(num2 = CID_con2_4$mass)
 con3 <- data.frame(num3 = CID_con3_4$mass)
@@ -414,3 +410,32 @@ for (i in 1:nrow(con3)) {
         matched_con2_con3 <- rbind(matched_con2_con3, matching_values)
     }
 }
+
+
+
+
+
+exp_merged1 <- merge(matched_exp1_exp2, matched_exp1_exp3, by = "value_exp1", all = TRUE)
+exp_merged2 <- merge(matched_exp1_exp2, matched_exp2_exp3, by = "value_exp2", all = TRUE)
+exp_merged3 <- merge(exp_merged1, exp_merged2, by.x = c("value_exp1", "value_exp2"), by.y = c("value_exp1", "value_exp2"), all = TRUE)
+exp_merged3$value_exp3 <- ifelse(!is.na(exp_merged3$value_exp3.x), exp_merged3$value_exp3.x, ifelse(!is.na(exp_merged3$value_exp3.y), exp_merged3$value_exp3.y, NA))
+exp_merged3$value_exp3.x <- NULL
+exp_merged3$value_exp3.y <- NULL
+exp_merged <- exp_merged3
+
+con_merged1 <- merge(matched_con1_con2, matched_con1_con3, by = "value_con1", all = TRUE)
+con_merged2 <- merge(matched_con1_con2, matched_con2_con3, by = "value_con2", all = TRUE)
+con_merged3 <- merge(con_merged1, con_merged2, by.x = c("value_con1", "value_con2"), by.y = c("value_con1", "value_con2"), all = TRUE)
+con_merged3$value_con3 <- ifelse(!is.na(con_merged3$value_con3.x), con_merged3$value_con3.x, ifelse(!is.na(con_merged3$value_con3.y), con_merged3$value_con3.y, NA))
+con_merged3$value_con3.x <- NULL
+con_merged3$value_con3.y <- NULL
+con_merged <- con_merged3
+
+exp_merged$value_exp1_sort <- ifelse(is.na(exp_merged$value_exp1), exp_merged$value_exp2, exp_merged$value_exp1)
+exp_merged <- exp_merged[order(exp_merged$value_exp1_sort), ]
+exp_merged$value_exp1_sort <- NULL
+
+con_merged$value_con1_sort <- ifelse(is.na(con_merged$value_con1), con_merged$value_con2, con_merged$value_con1)
+con_merged <- con_merged[order(con_merged$value_con1_sort), ]
+con_merged$value_con1_sort <- NULL
+
