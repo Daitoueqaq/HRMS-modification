@@ -527,5 +527,13 @@ con_merged_1_2_3 <- con_merged_1_2_3[,c("value_con1","RI_IS_con1","Intensity_con
                                         "value_con3","RI_IS_con3","Intensity_con3")]
 
 
-exp_merged_1_2_3$RI_mean <- rowMeans(exp_merged_1_2_3[, c("RI_IS_exp1", "RI_IS_exp2", "RI_IS_exp3")], na.rm = TRUE)
-con_merged_1_2_3$RI_mean <- rowMeans(con_merged_1_2_3[, c("RI_IS_con1", "RI_IS_con2", "RI_IS_con3")], na.rm = TRUE)
+exp_merged_1_2_3$RI_mean_exp <- rowMeans(exp_merged_1_2_3[, c("RI_IS_exp1", "RI_IS_exp2", "RI_IS_exp3")], na.rm = TRUE)
+con_merged_1_2_3$RI_mean_con <- rowMeans(con_merged_1_2_3[, c("RI_IS_con1", "RI_IS_con2", "RI_IS_con3")], na.rm = TRUE)
+exp_merged_1_2_3$mass_index_exp <- rowMeans(exp_merged_1_2_3[, c("value_exp1", "value_exp2", "value_exp3")], na.rm = TRUE)
+con_merged_1_2_3$mass_index_con <- rowMeans(con_merged_1_2_3[, c("value_con1", "value_con2", "value_con3")], na.rm = TRUE)
+exp_merged_1_2_3$RI_mean_exp <- as.numeric(exp_merged_1_2_3$RI_mean_exp)
+con_merged_1_2_3$RI_mean_con <- as.numeric(con_merged_1_2_3$RI_mean_con)
+exp_merged_1_2_3$mass_index_exp <- as.numeric(exp_merged_1_2_3$mass_index_exp)
+con_merged_1_2_3$mass_index_con <- as.numeric(con_merged_1_2_3$mass_index_con)
+
+test_3 <- exp_merged_1_2_3[exp_merged_1_2_3$RI_mean_exp >= 0.001, ]
