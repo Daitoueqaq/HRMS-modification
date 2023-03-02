@@ -484,3 +484,48 @@ con_merged_1_2_3$value_con1_sort <- ifelse(is.na(con_merged_1_2_3$value_con1), c
 con_merged_1_2_3 <- con_merged_1_2_3[order(con_merged_1_2_3$value_con1_sort), ]
 con_merged_1_2_3$value_con1_sort <- NULL
 
+
+
+Internal_standard <- 420.99373
+mass_IS_exp1 <- which.min(abs(exp_merged_1_2_3$value_exp1 - Internal_standard))
+intensity_IS_exp1 <- exp_merged_1_2_3$Intensity_exp1[mass_IS_exp1]
+intensity_IS_exp1 <- as.numeric(intensity_IS_exp1)
+mass_IS_exp2 <- which.min(abs(exp_merged_1_2_3$value_exp2 - Internal_standard))
+intensity_IS_exp2 <- exp_merged_1_2_3$Intensity_exp2[mass_IS_exp1]
+intensity_IS_exp2 <- as.numeric(intensity_IS_exp2)
+mass_IS_exp3 <- which.min(abs(exp_merged_1_2_3$value_exp3 - Internal_standard))
+intensity_IS_exp3 <- exp_merged_1_2_3$Intensity_exp3[mass_IS_exp1]
+intensity_IS_exp3 <- as.numeric(intensity_IS_exp3)
+
+mass_IS_con1 <- which.min(abs(con_merged_1_2_3$value_con1 - Internal_standard))
+intensity_IS_con1 <- con_merged_1_2_3$Intensity_con1[mass_IS_con1]
+intensity_IS_con1 <- as.numeric(intensity_IS_con1)
+mass_IS_con2 <- which.min(abs(con_merged_1_2_3$value_con2 - Internal_standard))
+intensity_IS_con2 <- con_merged_1_2_3$Intensity_con2[mass_IS_con2]
+intensity_IS_con2 <- as.numeric(intensity_IS_con2)
+mass_IS_con3 <- which.min(abs(con_merged_1_2_3$value_con3 - Internal_standard))
+intensity_IS_con3 <- con_merged_1_2_3$Intensity_con3[mass_IS_con3]
+intensity_IS_con3 <- as.numeric(intensity_IS_con3)
+
+exp_merged_1_2_3$Intensity_exp1 <- as.numeric(exp_merged_1_2_3$Intensity_exp1)
+exp_merged_1_2_3$Intensity_exp2 <- as.numeric(exp_merged_1_2_3$Intensity_exp2)
+exp_merged_1_2_3$Intensity_exp3 <- as.numeric(exp_merged_1_2_3$Intensity_exp3)
+con_merged_1_2_3$Intensity_con1 <- as.numeric(con_merged_1_2_3$Intensity_con1)
+con_merged_1_2_3$Intensity_con2 <- as.numeric(con_merged_1_2_3$Intensity_con2)
+con_merged_1_2_3$Intensity_con3 <- as.numeric(con_merged_1_2_3$Intensity_con3)
+exp_merged_1_2_3$RI_IS_exp1 <- exp_merged_1_2_3$Intensity_exp1 / intensity_IS_exp1
+exp_merged_1_2_3$RI_IS_exp2 <- exp_merged_1_2_3$Intensity_exp2 / intensity_IS_exp2
+exp_merged_1_2_3$RI_IS_exp3 <- exp_merged_1_2_3$Intensity_exp3 / intensity_IS_exp3
+con_merged_1_2_3$RI_IS_con1 <- con_merged_1_2_3$Intensity_con1 / intensity_IS_con1
+con_merged_1_2_3$RI_IS_con2 <- con_merged_1_2_3$Intensity_con2 / intensity_IS_con2
+con_merged_1_2_3$RI_IS_con3 <- con_merged_1_2_3$Intensity_con3 / intensity_IS_con3
+exp_merged_1_2_3 <- exp_merged_1_2_3[,c("value_exp1","RI_IS_exp1","Intensity_exp1",
+                                        "value_exp2","RI_IS_exp2","Intensity_exp2",
+                                        "value_exp3","RI_IS_exp3","Intensity_exp3")]
+con_merged_1_2_3 <- con_merged_1_2_3[,c("value_con1","RI_IS_con1","Intensity_con1",
+                                        "value_con2","RI_IS_con2","Intensity_con2",
+                                        "value_con3","RI_IS_con3","Intensity_con3")]
+
+
+exp_merged_1_2_3$RI_mean <- rowMeans(exp_merged_1_2_3[, c("RI_IS_exp1", "RI_IS_exp2", "RI_IS_exp3")], na.rm = TRUE)
+con_merged_1_2_3$RI_mean <- rowMeans(con_merged_1_2_3[, c("RI_IS_con1", "RI_IS_con2", "RI_IS_con3")], na.rm = TRUE)
