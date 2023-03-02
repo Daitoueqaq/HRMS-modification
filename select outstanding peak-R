@@ -476,3 +476,11 @@ options(digits=8)
 con3_modified <- data.frame(value_con3 = CID_con3_4$value_con3,Intensity_con3 = CID_con3_4$Intensity_con3,RI_con3 = CID_con3_4$RI_con3)
 con3_modified$value_con3 <- as.numeric(con3_modified$value_con3)
 con_merged_1_2_3 <- merge(con_merged_1_2, con3_modified, by="value_con3", all.x = TRUE)
+
+exp_merged_1_2_3$value_exp1_sort <- ifelse(is.na(exp_merged_1_2_3$value_exp1), exp_merged_1_2_3$value_exp2, exp_merged_1_2_3$value_exp1)
+exp_merged_1_2_3 <- exp_merged_1_2_3[order(exp_merged_1_2_3$value_exp1_sort), ]
+exp_merged_1_2_3$value_exp1_sort <- NULL
+con_merged_1_2_3$value_con1_sort <- ifelse(is.na(con_merged_1_2_3$value_con1), con_merged_1_2_3$value_con2, con_merged_1_2_3$value_con1)
+con_merged_1_2_3 <- con_merged_1_2_3[order(con_merged_1_2_3$value_con1_sort), ]
+con_merged_1_2_3$value_con1_sort <- NULL
+
