@@ -119,12 +119,89 @@ RI_1_con3 = CID_in_con3 / max_cid_con3
 CID_con3_3["RI_con3"] = RI_1_con3.values
 CID_con3_4 = CID_con3_3[CID_con3_3["logic"] != 0]
 
-# Set options for displaying numbers
-pd.set_option("precision", 8)
+import pandas as pd
 
-# Create data frames for experiments and controls
-exp1 = pd.DataFrame({"num1": CID_exp1_4["mass"].astype(float)})
-exp2 = pd.DataFrame({"num2": CID_exp2_4["mass"].astype(float)})
-exp3 = pd.DataFrame({"num3": CID_exp3_4["mass"].astype(float)})
+# set options
+pd.set_option('precision', 8)
 
+# create dataframes for exp1, exp2, and exp3
+exp1 = pd.DataFrame({'num1': CID_exp1_4['mass']})
+exp2 = pd.DataFrame({'num2': CID_exp2_4['mass']})
+exp3 = pd.DataFrame({'num3': CID_exp3_4['mass']})
+
+# convert to numeric data type
+exp1['num1'] = pd.to_numeric(exp1['num1'])
+exp2['num2'] = pd.to_numeric(exp2['num2'])
+exp3['num3'] = pd.to_numeric(exp3['num3'])
+
+# create dataframes for con1, con2, and con3
+con1 = pd.DataFrame({'num1': CID_con1_4['mass']})
+con2 = pd.DataFrame({'num2': CID_con2_4['mass']})
+con3 = pd.DataFrame({'num3': CID_con3_4['mass']})
+
+# convert to numeric data type
+con1['num1'] = pd.to_numeric(con1['num1'])
+con2['num2'] = pd.to_numeric(con2['num2'])
+con3['num3'] = pd.to_numeric(con3['num3'])
+
+import pandas as pd
+import numpy as np
+
+matched_exp1_from12 = pd.DataFrame(columns=['value'])
+matched_exp2_from12 = pd.DataFrame(columns=['value'])
+
+for i in range(exp1.shape[0]):
+    percent_diff = np.abs((exp2 - exp1.iloc[i,:]) / ((exp2 + exp1.iloc[i,:]) / 2))
+    within_range = np.where(np.logical_and(percent_diff > -0.000005, percent_diff < 0.000005))[0]
+
+    if within_range.size > 0:
+        matched_values = exp2.iloc[within_range,:]
+        matched_exp2_from12 = pd.concat([matched_exp2_from12, pd.DataFrame({'value': matched_values.values.flatten()})], axis=0)
+
+    within_range = percent_diff <= 0.000005
+
+    if np.sum(within_range) > 0:
+        matched_values = exp1.iloc[i,:]
+        matched_exp1_from12 = pd.concat([matched_exp1_from12, pd.DataFrame({'value': matched_values.values.flatten()})], axis=0)
+
+matched_exp1_exp2 = pd.DataFrame(columns=['value_exp1', 'value_exp2'])
+
+for i in range(exp2.shape[0]):
+    percent_diff = np.abs((exp1 - exp2.iloc[i,:]) / ((exp1 + exp2.iloc[i,:]) / 2))
+    within_range = np.where(np.logical_and(percent_diff > -0.000005, percent_diff < 0.000005))[0]
+
+    if within_range.size > 0:
+        matching_values = pd.DataFrame({'value_exp1': exp1.iloc[within_range,:].values.flatten(), 
+                                         'value_exp2': np.repeat(exp2.iloc[i,:].values.flatten(), within_range.size)})
+        matched_exp1_exp2 = pd.concat([matched_exp1_exp2, matching_values], axis=0)
+
+
+matched_exp1_from13 = pd.DataFrame(columns=['value'])
+matched_exp3_from13 = pd.DataFrame(columns=['value'])
+
+for i in range(exp1.shape[0]):
+    percent_diff = np.abs((exp3 - exp1.iloc[i,:]) / ((exp3 + exp1.iloc[i,:]) / 2))
+    within_range = np.where(np.logical_and(percent_diff > -0.000005, percent_diff < 0.000005))[0]
+
+    if within_range.size > 0:
+        matched_values = exp3.iloc[within_range,:]
+        matched_exp3_from13 = pd.concat([matched_exp3_from13, pd.DataFrame({'value': matched_values.values.flatten()})], axis=0)
+
+    within_range = percent_diff <= 0.000005
+
+    if np.sum(within_range) > 0:
+        matched_values = exp1.iloc[i,:]
+        matched_exp1_from13 = pd.concat([matched_exp1_from13, pd.DataFrame({'value': matched_values.values.flatten()})], axis=0)
+
+
+matched_exp1_exp3 = pd.DataFrame(columns=['value_exp1', 'value_exp3'])
+
+for i in range(exp3.shape[0]):
+    percent_diff = np.abs((exp1 - exp3.iloc[i,:]) / ((exp1 + exp3.iloc[i,:]) / 2))
+    within_range = np.where(np.logical_and(percent_diff > -0.000005, percent_diff < 0.000005))[0]
+
+    if within_range.size > 0:
+        matching_values = pd.DataFrame({'value_exp1': exp1.iloc[within_range,:].values.flatten(), 
+                                         'value_exp3': np.repeat(exp3.iloc[i,:].values.flatten(), within_range.size)})
+        matched_exp1_exp3 = pd.concat([matched_exp1_exp3, matching_values], axis=0)
 
