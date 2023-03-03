@@ -205,3 +205,60 @@ for i in range(exp3.shape[0]):
                                          'value_exp3': np.repeat(exp3.iloc[i,:].values.flatten(), within_range.size)})
         matched_exp1_exp3 = pd.concat([matched_exp1_exp3, matching_values], axis=0)
 
+import pandas as pd
+import numpy as np
+
+matched_exp2_from23 = pd.DataFrame({'value': []})
+matched_exp3_from23 = pd.DataFrame({'value': []})
+
+for i in range(exp2.shape[0]):
+    percent_diff = np.abs((exp3 - exp2.iloc[i,:]) / ((exp3 + exp2.iloc[i,:]) / 2))
+    within_range = np.where((percent_diff > -0.000005) & (percent_diff < 0.000005))[0]
+    
+    if len(within_range) > 0:
+        matched_values = exp3.iloc[within_range,:]
+        matched_exp3_from23 = pd.concat([matched_exp3_from23, pd.DataFrame({'value': matched_values.values.flatten()})])
+
+    within_range = percent_diff <= 0.000005
+    
+    if np.sum(within_range) > 0:
+        matched_values = exp2.iloc[i,:]
+        matched_exp2_from23 = pd.concat([matched_exp2_from23, pd.DataFrame({'value': matched_values.values.flatten()})])
+
+matched_exp2_exp3 = pd.DataFrame({'value_exp2': [], 'value_exp3': []})
+
+for i in range(exp3.shape[0]):
+    percent_diff = np.abs((exp2 - exp3.iloc[i,:]) / ((exp2 + exp3.iloc[i,:]) / 2)) 
+    within_range = np.where((percent_diff > -0.000005) & (percent_diff < 0.000005))[0]
+    
+    if len(within_range) > 0:
+        matching_values = pd.DataFrame({'value_exp2': exp2.iloc[within_range,:].values.flatten(), 
+                                         'value_exp3': np.repeat(exp3.iloc[i,:].values.flatten(), len(within_range))})
+        matched_exp2_exp3 = pd.concat([matched_exp2_exp3, matching_values])
+
+matched_con1_from12 = pd.DataFrame({'value': []})
+matched_con2_from12 = pd.DataFrame({'value': []})
+
+for i in range(con1.shape[0]):
+    percent_diff = np.abs((con2 - con1.iloc[i,:]) / ((con2 + con1.iloc[i,:]) / 2)) 
+    within_range = np.where((percent_diff > -0.000005) & (percent_diff < 0.000005))[0]
+    
+    if len(within_range) > 0:
+        matched_values = con2.iloc[within_range,:]
+        matched_con2_from12 = pd.concat([matched_con2_from12, pd.DataFrame({'value': matched_values.values.flatten()})])
+
+    within_range = percent_diff <= 0.000005
+    
+    if np.sum(within_range) > 0:
+        matched_values = con1.iloc[i,:]
+        matched_con1_from12 = pd.concat([matched_con1_from12, pd.DataFrame({'value': matched_values.values.flatten()})])
+
+matched_con1_con2 = pd.DataFrame({'value_con1': [], 'value_con2': []})
+
+for i in range(con2.shape[0]):
+    percent_diff = np.abs((con1 - con2.iloc[i,:]) / ((con1 + con2.iloc[i,:]) / 2)) 
+    within_range = np.where((percent_diff > -0.000005) & (percent_diff < 0.000005))[0]
+    
+    if len(within_range) > 0:
+        matching_values = pd.DataFrame({'value_con1': con1.iloc[within_range,:].values.flatten(), 
+                                         'value_con2': np.repeat(con2.iloc[i,:].values.flatten(), len(within_range))})
