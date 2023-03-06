@@ -542,34 +542,3 @@ mass_index_con_t <- con_merged_1_2_3$mass_index_con
 mtched_exp <- data.frame(value = numeric())
 mtched_con <- data.frame(value = numeric())
 
-for (i in 1:nrow(mass_index_exp_t)) {
-
-    percent_diff <- abs((mass_index_con_t - mass_index_exp_t[i,]) / ((mass_index_con_t + mass_index_exp_t[i,]) / 2)) 
-    
-    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
-    
-    if (length(within_range) > 0) {
-        matched_values <- mass_index_con_t[within_range,]
-        mtched_con <- rbind(mtched_con, data.frame(value = matched_values))
-    }
-    
-    within_range <- percent_diff <= 0.000005
-    
-    if (sum(within_range) > 0) {
-        matched_values <- mass_index_exp_t[i,]
-        mtched_exp <- rbind(mtched_exp, data.frame(value = matched_values))
-    }
-}
-
-deplicate_peaks <- data.frame(mass_index_exp = numeric(), mass_index_con = numeric())
-
-for (i in 1:nrow(mass_index_con_t)) {
-    percent_diff <- abs((mass_index_con_t - mass_index_exp_t[i,]) / ((mass_index_exp_t + mass_index_con_t[i,]) / 2)) 
-    within_range <- which(percent_diff > -0.000005 & percent_diff < 0.000005)
-    
-    if (length(within_range) > 0) {
-        matching_values <- data.frame(mass_index_exp = mass_index_exp_t[within_range,], 
-                                      mass_index_con = rep(mass_index_con_t[i,], length(within_range)))
-        deplicate_peaks <- rbind(deplicate_peaks, matching_values)
-    }
-}
