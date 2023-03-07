@@ -284,6 +284,7 @@ for (i in 1:nrow(exp3)) {
 
 matched_exp2_from23 <- data.frame(value = numeric())
 matched_exp3_from23 <- data.frame(value = numeric())
+pb <- progress_bar$new(total = nrow(exp2))
 
 for (i in 1:nrow(exp2)) {
     percent_diff <- abs((exp3 - exp2[i,]) / ((exp3 + exp2[i,]) / 2)) 
@@ -301,9 +302,11 @@ for (i in 1:nrow(exp2)) {
         matched_values <- exp2[i,]
         matched_exp2_from23 <- rbind(matched_exp2_from23, data.frame(value = matched_values))
     }
+    pb$tick()
 }
 
 matched_exp2_exp3 <- data.frame(value_exp2 = numeric(), value_exp3 = numeric())
+pb <- progress_bar$new(total = nrow(exp3))
 
 for (i in 1:nrow(exp3)) {
     percent_diff <- abs((exp2 - exp3[i,]) / ((exp2 + exp3[i,]) / 2)) 
@@ -314,10 +317,12 @@ for (i in 1:nrow(exp3)) {
                                       value_exp3 = rep(exp3[i,], length(within_range)))
         matched_exp2_exp3 <- rbind(matched_exp2_exp3, matching_values)
     }
+    pb$tick()
 }
 
 matched_con1_from12 <- data.frame(value = numeric())
 matched_con2_from12 <- data.frame(value = numeric())
+pb <- progress_bar$new(total = nrow(con1))
 
 for (i in 1:nrow(con1)) {
     percent_diff <- abs((con2 - con1[i,]) / ((con2 + con1[i,]) / 2)) 
@@ -335,9 +340,11 @@ for (i in 1:nrow(con1)) {
         matched_values <- con1[i,]
         matched_con1_from12 <- rbind(matched_con1_from12, data.frame(value = matched_values))
     }
+    pb$tick()
 }
 
 matched_con1_con2 <- data.frame(value_con1 = numeric(), value_con2 = numeric())
+pb <- progress_bar$new(total = nrow(con2))
 
 for (i in 1:nrow(con2)) {
     percent_diff <- abs((con1 - con2[i,]) / ((con1 + con2[i,]) / 2)) 
@@ -348,11 +355,13 @@ for (i in 1:nrow(con2)) {
                                       value_con2 = rep(con2[i,], length(within_range)))
         matched_con1_con2 <- rbind(matched_con1_con2, matching_values)
     }
+    pb$tick()
 }
 
 
 matched_con1_from13 <- data.frame(value = numeric())
 matched_con3_from13 <- data.frame(value = numeric())
+pb <- progress_bar$new(total = nrow(con1))
 
 for (i in 1:nrow(con1)) {
     percent_diff <- abs((con3 - con1[i,]) / ((con3 + con1[i,]) / 2)) 
@@ -370,9 +379,11 @@ for (i in 1:nrow(con1)) {
         matched_values <- con1[i,]
         matched_con1_from13 <- rbind(matched_con1_from13, data.frame(value = matched_values))
     }
+    pb$tick()
 }
 
 matched_con1_con3 <- data.frame(value_con1 = numeric(), value_con3 = numeric())
+pb <- progress_bar$new(total = nrow(con3))
 
 for (i in 1:nrow(con3)) {
     percent_diff <- abs((con1 - con3[i,]) / ((con1 + con3[i,]) / 2)) 
@@ -383,11 +394,13 @@ for (i in 1:nrow(con3)) {
                                       value_con3 = rep(con3[i,], length(within_range)))
         matched_con1_con3 <- rbind(matched_con1_con3, matching_values)
     }
+    pb$tick()
 }
 
 
 matched_con2_from23 <- data.frame(value = numeric())
 matched_con3_from23 <- data.frame(value = numeric())
+pb <- progress_bar$new(total = nrow(con2))
 
 for (i in 1:nrow(con2)) {
     percent_diff <- abs((con3 - con2[i,]) / ((con3 + con2[i,]) / 2)) 
@@ -405,9 +418,11 @@ for (i in 1:nrow(con2)) {
         matched_values <- con2[i,]
         matched_con2_from23 <- rbind(matched_con2_from23, data.frame(value = matched_values))
     }
+    pb$tick()
 }
 
 matched_con2_con3 <- data.frame(value_con2 = numeric(), value_con3 = numeric())
+pb <- progress_bar$new(total = nrow(con3))
 
 for (i in 1:nrow(con3)) {
     percent_diff <- abs((con2 - con3[i,]) / ((con2 + con3[i,]) / 2)) 
@@ -418,6 +433,7 @@ for (i in 1:nrow(con3)) {
                                       value_con3 = rep(con3[i,], length(within_range)))
         matched_con2_con3 <- rbind(matched_con2_con3, matching_values)
     }
+    pb$tick()
 }
 
 
@@ -547,6 +563,8 @@ con_merged_1_2_3$mass_index_con <- as.numeric(con_merged_1_2_3$mass_index_con)
 
 ###################################################OUTPUT#################################################################
 exist_peaks <- data.frame()
+pb <- progress_bar$new(total = nrow(exp_merged_1_2_3))
+
 for (i in 1:nrow(exp_merged_1_2_3)) {
     percent_diff <- abs((exp_merged_1_2_3$mass_index_exp[i] - con_merged_1_2_3$mass_index_con) / 
                             ((exp_merged_1_2_3$mass_index_exp[i] + con_merged_1_2_3$mass_index_con)/2))
@@ -555,9 +573,12 @@ for (i in 1:nrow(exp_merged_1_2_3)) {
         exist_peaks <- rbind(exist_peaks, data.frame(mass_index_exp = exp_merged_1_2_3$mass_index_exp[i], 
                                                  mass_index_con = con_merged_1_2_3$mass_index_con[within_threshold]))
     }
+    pb$tick()
 }
 
 new_peaks_exp <- data.frame()
+pb <- progress_bar$new(total = nrow(exp_merged_1_2_3))
+
 for (i in 1:nrow(exp_merged_1_2_3)) {
     percent_diff <- abs((exp_merged_1_2_3$mass_index_exp[i] - con_merged_1_2_3$mass_index_con) / 
                             ((exp_merged_1_2_3$mass_index_exp[i] + con_merged_1_2_3$mass_index_con)/2))
@@ -565,6 +586,7 @@ for (i in 1:nrow(exp_merged_1_2_3)) {
     if (length(within_threshold) == 0) {
         new_peaks_exp <- rbind(new_peaks_exp, data.frame(mass_index_exp = exp_merged_1_2_3$mass_index_exp[i]))
     }
+    pb$tick()
 }
 
 new_peaks_exp <- merge (new_peaks_exp,exp_merged_1_2_3)
