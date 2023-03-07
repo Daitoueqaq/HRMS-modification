@@ -84,11 +84,11 @@ percent_diff <- 0.000005
 
 # Create a function to calculate the desired mass
 desired_mass <- function(c, f, h, o) {
-    c*C + f*F + h*H + o*O
+    mass <- c*C + f*F + h*H + o*O
+    list(c = c, f = f, h = h, o = o, mass = mass)
 }
 
-# Create an empty vector to store the desired masses
-desired_masses <- numeric()
+desired_masses <- list()
 
 # Loop through all combinations of c, f, h, o, n, s and calculate the corresponding desired mass
 pb <- progress_bar$new(total = length(c_range) * length(f_range) * length(h_range) * length(o_range), format = "[:bar] :percent eta: :eta")
@@ -105,6 +105,7 @@ for (c in c_range) {
 
 # Get the unique values of the desired masses
 desired_masses <- unique(desired_masses)
+desired_masses_df <- do.call(rbind, desired_masses)
 
 chemical_formula <- data.frame()
 pb <- progress_bar$new(total = nrow(new_peaks_exp_RI_0.001))
