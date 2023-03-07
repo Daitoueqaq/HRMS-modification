@@ -96,7 +96,7 @@ for (c in c_range) {
     for (f in f_range) {
         for (h in h_range) {
             for (o in o_range) {
-                        desired_masses <- c(desired_masses, desired_mass(c, f, h, o, n, s))
+                        desired_masses <- c(desired_masses, desired_mass(c, f, h, o))
                         pb$tick()
             }
         }
