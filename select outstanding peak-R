@@ -203,8 +203,10 @@ merged_con <- unique (matched_con_df)
 
 ####################################################################################################################
 
+library(progress)
 matched_exp1_from12 <- data.frame(value = numeric())
 matched_exp2_from12 <- data.frame(value = numeric())
+pb <- progress_bar$new(total = nrow(exp1))
 
 for (i in 1:nrow(exp1)) {
     percent_diff <- abs((exp2 - exp1[i,]) / ((exp2 + exp1[i,]) / 2)) 
@@ -222,9 +224,11 @@ for (i in 1:nrow(exp1)) {
         matched_values <- exp1[i,]
         matched_exp1_from12 <- rbind(matched_exp1_from12, data.frame(value = matched_values))
     }
+    pb$tick()
 }
 
 matched_exp1_exp2 <- data.frame(value_exp1 = numeric(), value_exp2 = numeric())
+pb <- progress_bar$new(total = nrow(exp2))
 
 for (i in 1:nrow(exp2)) {
     percent_diff <- abs((exp1 - exp2[i,]) / ((exp1 + exp2[i,]) / 2)) 
@@ -235,11 +239,13 @@ for (i in 1:nrow(exp2)) {
                                       value_exp2 = rep(exp2[i,], length(within_range)))
         matched_exp1_exp2 <- rbind(matched_exp1_exp2, matching_values)
     }
+    pb$tick()
 }
 
 
 matched_exp1_from13 <- data.frame(value = numeric())
 matched_exp3_from13 <- data.frame(value = numeric())
+pb <- progress_bar$new(total = nrow(exp1))
 
 for (i in 1:nrow(exp1)) {
     percent_diff <- abs((exp3 - exp1[i,]) / ((exp3 + exp1[i,]) / 2)) 
@@ -257,9 +263,11 @@ for (i in 1:nrow(exp1)) {
         matched_values <- exp1[i,]
         matched_exp1_from13 <- rbind(matched_exp1_from13, data.frame(value = matched_values))
     }
+    pb$tick()
 }
 
 matched_exp1_exp3 <- data.frame(value_exp1 = numeric(), value_exp3 = numeric())
+pb <- progress_bar$new(total = nrow(exp3))
 
 for (i in 1:nrow(exp3)) {
     percent_diff <- abs((exp1 - exp3[i,]) / ((exp1 + exp3[i,]) / 2)) 
@@ -270,6 +278,7 @@ for (i in 1:nrow(exp3)) {
                                       value_exp3 = rep(exp3[i,], length(within_range)))
         matched_exp1_exp3 <- rbind(matched_exp1_exp3, matching_values)
     }
+    pb$tick()
 }
 
 
