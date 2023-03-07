@@ -561,3 +561,9 @@ for (i in 1:nrow(exp_merged_1_2_3)) {
 new_peaks_exp <- merge (new_peaks_exp,exp_merged_1_2_3)
 new_peaks_exp_RI_0.001 <- new_peaks_exp[new_peaks_exp$RI_mean_exp > 0.001, ]
 
+mid <- merge(exist_peaks,exp_merged_1_2_3)
+mid1 <- merge(mid,con_merged_1_2_3)
+mid1$RI_mean_exp <- as.numeric(mid1$RI_mean_exp)
+mid1$RI_mean_con <- as.numeric(mid1$RI_mean_con)
+exist_peaks_RI_10  <- mid1 [mid1$RI_mean_exp > 10 * mid1$RI_mean_con, ]
+exist_peaks_RI_10_0.001 <- exist_peaks_RI_10[exist_peaks_RI_10$RI_mean_exp > 0.001, ]
