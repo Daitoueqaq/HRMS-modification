@@ -1,3 +1,4 @@
+##########################################################SIX_ELEMENTS##############################################
 library(progress)
 
 C <- 12.00000
@@ -19,8 +20,8 @@ s_range <- 0:3
 percent_diff <- 0.000005
 
 # Create a function to calculate the desired mass
-desired_mass <- function(a, b, c, d, e, f) {
-    a*C + b*F + c*H + d*O + e*N + f*S
+desired_mass <- function(c, f, h, o, n, s) {
+    c*C + f*F + h*H + o*O + n*N + s*S
 }
 
 # Create an empty vector to store the desired masses
@@ -28,13 +29,13 @@ desired_masses <- numeric()
 
 # Loop through all combinations of c, f, h, o, n, s and calculate the corresponding desired mass
 pb <- progress_bar$new(total = length(c_range) * length(f_range) * length(h_range) * length(o_range) * length(n_range) * length(s_range), format = "[:bar] :percent eta: :eta")
-for (a in c_range) {
-    for (b in f_range) {
-        for (c in h_range) {
-            for (d in o_range) {
-                for (e in n_range) {
-                    for (f in s_range) {
-                        desired_masses <- c(desired_masses, desired_mass(a, b, c, d, e, f))
+for (c in c_range) {
+    for (f in f_range) {
+        for (h in h_range) {
+            for (o in o_range) {
+                for (n in n_range) {
+                    for (s in s_range) {
+                        desired_masses <- c(desired_masses, desired_mass(c, f, h, o, n, s))
                         pb$tick()
                     }
                 }
@@ -60,6 +61,65 @@ for (i in 1:nrow(new_peaks_exp_RI_0.001)) {
     pb$tick()
 }
 
-masses_matched_chem_formula <- unique.data.frame(chemical_formula$mass_index_exp)
+masses_matched_chem_formula <- unique(chemical_formula$mass_index_exp)
+
+masses_matched_chem_formula
+
+######################################################################################FOUR_ELEMENTS####################
+library(progress)
+
+C <- 12.00000
+F <- 18.998403
+H <- 1.007825
+O <- 15.994915
+
+# Define the range of integer values for each element
+c_range <- 0:8
+f_range <- 0:15
+h_range <- 0:20
+o_range <- 0:6
+
+# Define the percent difference
+percent_diff <- 0.000005
+
+# Create a function to calculate the desired mass
+desired_mass <- function(c, f, h, o) {
+    c*C + f*F + h*H + o*O
+}
+
+# Create an empty vector to store the desired masses
+desired_masses <- numeric()
+
+# Loop through all combinations of c, f, h, o, n, s and calculate the corresponding desired mass
+pb <- progress_bar$new(total = length(c_range) * length(f_range) * length(h_range) * length(o_range), format = "[:bar] :percent eta: :eta")
+for (c in c_range) {
+    for (f in f_range) {
+        for (h in h_range) {
+            for (o in o_range) {
+                        desired_masses <- c(desired_masses, desired_mass(c, f, h, o, n, s))
+                        pb$tick()
+            }
+        }
+    }
+}
+
+# Get the unique values of the desired masses
+desired_masses <- unique(desired_masses)
+
+chemical_formula <- data.frame()
+pb <- progress_bar$new(total = nrow(new_peaks_exp_RI_0.001))
+
+for (i in 1:nrow(new_peaks_exp_RI_0.001)) {
+    percent_diff <- abs((new_peaks_exp_RI_0.001$mass_index_exp[i] - desired_masses) / 
+                            ((new_peaks_exp_RI_0.001$mass_index_exp[i] + desired_masses)/2))
+    within_threshold <- which(percent_diff < 0.000005 & percent_diff > -0.000005)
+    if (length(within_threshold) > 0) {
+        chemical_formula <- rbind(chemical_formula, data.frame(mass_index_exp = new_peaks_exp_RI_0.001$mass_index_exp[i], 
+                                               desired_masses = desired_masses[within_threshold]))
+    }
+    pb$tick()
+}
+
+masses_matched_chem_formula <- unique(chemical_formula$mass_index_exp)
 
 masses_matched_chem_formula
