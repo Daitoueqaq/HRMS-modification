@@ -537,8 +537,24 @@ exp_merged_1_2_3$mass_index_exp <- as.numeric(exp_merged_1_2_3$mass_index_exp)
 con_merged_1_2_3$mass_index_con <- as.numeric(con_merged_1_2_3$mass_index_con)
 
 ###################################################OUTPUT#################################################################
-mass_index_exp_t <- exp_merged_1_2_3$mass_index_exp
-mass_index_con_t <- con_merged_1_2_3$mass_index_con
-mtched_exp <- data.frame(value = numeric())
-mtched_con <- data.frame(value = numeric())
 
+exist_peaks <- data.frame()
+for (i in 1:nrow(exp_merged_1_2_3)) {
+    percent_diff <- abs((exp_merged_1_2_3$mass_index_exp[i] - con_merged_1_2_3$mass_index_con) / 
+                            ((exp_merged_1_2_3$mass_index_exp[i] + con_merged_1_2_3$mass_index_con)/2))
+    within_threshold <- which(percent_diff < 0.000005 & percent_diff > -0.000005)
+    if (length(within_threshold) > 0) {
+        exist_peaks <- rbind(exist_peaks, data.frame(exp_mass_index = exp_merged_1_2_3$mass_index_exp[i], 
+                                                 con_mass_index = con_merged_1_2_3$mass_index_con[within_threshold]))
+    }
+}
+
+new_peaks_exp <- data.frame()
+for (i in 1:nrow(exp_merged_1_2_3)) {
+    percent_diff <- abs((exp_merged_1_2_3$mass_index_exp[i] - con_merged_1_2_3$mass_index_con) / 
+                            ((exp_merged_1_2_3$mass_index_exp[i] + con_merged_1_2_3$mass_index_con)/2))
+    within_threshold <- which(percent_diff < 0.000005 & percent_diff > -0.000005)
+    if (length(within_threshold) == 0) {
+        new_peaks_exp <- rbind(new_peaks_exp, data.frame(exp_mass_index = exp_merged_1_2_3$mass_index_exp[i]))
+    }
+}
