@@ -102,8 +102,8 @@ S <- 31.972072
 # Define the range of integer values for each element
 c_range <- 0:8
 f_range <- 0:15
-h_range <- 0:20
-o_range <- 0:8
+h_range <- 0:15
+o_range <- 0:6
 n_range <- 0:3
 s_range <- 0:3
 
@@ -138,8 +138,8 @@ for (c in c_range) {
 }
 
 desired_masses_df <- do.call(rbind, desired_masses)
-num_rows <- length(desired_masses_df) %/% 5
-num_cols <- 5
+num_rows <- length(desired_masses_df) %/% 7
+num_cols <- 7
 desired_masses_mat <- matrix(desired_masses_df, nrow=num_rows, ncol=num_cols, byrow=T)
 desired_masses_df_1 <- as.data.frame(desired_masses_mat)
 colnames(desired_masses_df_1) <- c("Carbon", "Fluorine", "Hydrogen", "Oxygen", "Nitrogen", "Sulfur", "Exact_Mass")
