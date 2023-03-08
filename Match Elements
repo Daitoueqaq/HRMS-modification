@@ -190,5 +190,5 @@ for (i in 1:nrow(desired_masses_df_1)) {
 }
 
 library("writexl")
-write_xlsx(result_from_exist_peaks,"A:/files/Princton_Data/test_data_61_7/result_from_exist_peaks.xlsx")
-write_xlsx(result_from_new_peaks,"A:/files/Princton_Data/test_data_61_7/result_from_new_peaks.xlsx")
+write_xlsx(result_from_exist_peaks,"A:/files/Princton_Data/test_data_61_7/result_from_exist_peaks_6elements.xlsx")
+write_xlsx(result_from_new_peaks,"A:/files/Princton_Data/test_data_61_7/result_from_new_peaks_6elements.xlsx")
