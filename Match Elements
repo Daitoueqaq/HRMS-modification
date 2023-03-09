@@ -100,12 +100,12 @@ N <- 14.003074
 S <- 31.972072
 
 # Define the range of integer values for each element
-c_range <- 0:8
-f_range <- 0:15
-h_range <- 0:15
-o_range <- 0:6
-n_range <- 0:3
-s_range <- 0:3
+c_range <- 0:10
+f_range <- 0:20
+h_range <- 0:20
+o_range <- 0:8
+n_range <- 0:5
+s_range <- 0:5
 
 # Define the percent difference
 percent_diff <- 0.000005
