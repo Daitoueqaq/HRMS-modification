@@ -2,7 +2,9 @@
 setwd("A:/files/Princton_Data/original")                          
 library(readxl)
 #Here we input the name of HRMS data
-dataset <- read_excel("2.xlsx")
+##
+##
+##
 CID <- read_excel("2.xlsx")
 CID1 <- CID[-c(1,2,3,4,5,6,7),]
 CID3 <- setNames(CID1, c("mass","intensity"))
