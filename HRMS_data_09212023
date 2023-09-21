@@ -7,25 +7,89 @@ import os
 def gaussian(x, amp, mu, sigma):
     return amp * np.exp(-(x - mu)**2 / (2 * sigma**2))
 
+input_file_path = "A:\\files\\ChenWWTP\\091923\\excel\\new\\before_use_blank_1_100_600.xlsx"
+output_file_path = "A:\\files\\ChenWWTP\\091923\\excel\\new\\test\\peak_data_gaussian.xlsx"
+
+df = pd.read_excel(input_file_path, skiprows=7)
+mass = df['Mass'].values
+intensity = df['Intensity'].values
+
+# Find preliminary peaks to choose windows for Gaussian fitting
+preliminary_peaks, _ = find_peaks(intensity, distance=5, height=1)
+
+# Containers to hold peak information
+peak_masses = []
+peak_intensities = []
+
+# Sliding window size; you may need to adjust this
+window_size = 5
+
+for peak in preliminary_peaks:
+    lower_bound = max(0, peak - window_size)
+    upper_bound = min(len(mass), peak + window_size)
+    
+    x_data = mass[lower_bound:upper_bound]
+    y_data = intensity[lower_bound:upper_bound]
+    
+    initial_guess = [max(y_data), np.mean(x_data), np.std(x_data)]
+    
+    try:
+        popt, _ = curve_fit(gaussian, x_data, y_data, p0=initial_guess)
+    except Exception as e:
+        print(f"Failed to fit Gaussian near x = {np.mean(x_data)}. Error: {e}")
+        continue
+    
+    peak_masses.append(popt[1])
+    peak_intensities.append(popt[0])
+
+# Save results to an Excel file
+df_peaks = pd.DataFrame({
+    'Peak Mass (Gaussian)': peak_masses,
+    'Peak Intensity (Gaussian)': peak_intensities
+})
+
+os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+df_peaks.to_excel(output_file_path, index=False)
+
+
+################################################################################################################################################
+
+import pandas as pd
+import numpy as np
+from scipy.optimize import curve_fit
+from scipy.signal import find_peaks
+import os
+
+def gaussian(x, amp, mu, sigma):
+    return amp * np.exp(-(x - mu)**2 / (2 * sigma**2))
+
+# Folders
 source_folder = "A:\\files\\ChenWWTP\\091923\\excel\\"
 output_folder = "A:\\files\\ChenWWTP\\091923\\excel\\peaks\\"
 
+# Make output folder if it doesn't exist
 os.makedirs(output_folder, exist_ok=True)
 
+# List all Excel files in the source folder
 excel_files = [f for f in os.listdir(source_folder) if f.endswith('.xlsx')]
 
+# Process each Excel file
 for excel_file in excel_files:
     input_file_path = os.path.join(source_folder, excel_file)
     
+    # Read Excel and get data
     df = pd.read_excel(input_file_path, skiprows=7)
     mass = df['Mass'].values
     intensity = df['Intensity'].values
     
+    # Find preliminary peaks to choose windows for Gaussian fitting
     preliminary_peaks, _ = find_peaks(intensity, distance=5, height=10)
     
+    # Containers to hold peak information
     peak_masses = []
     peak_intensities = []
     
+    # Sliding window size
     window_size = 5
     
     for peak in preliminary_peaks:
@@ -46,6 +110,7 @@ for excel_file in excel_files:
         peak_masses.append(popt[1])
         peak_intensities.append(popt[0])
     
+    # Save results to an Excel file
     output_file_name = "peaks_" + excel_file  # Append 'peaks_' to original file name
     output_file_path = os.path.join(output_folder, output_file_name)
     
@@ -55,3 +120,61 @@ for excel_file in excel_files:
     })
     
     df_peaks.to_excel(output_file_path, index=False)
+
+############################################################################################################################################
+
+
+import pandas as pd
+import os
+
+# Function to calculate ppm
+def calculate_ppm(theoretical, measured):
+    return 1e6 * abs(theoretical - measured) / theoretical
+
+# Path to the peaks folder and database
+peaks_folder = "A:\\files\\ChenWWTP\\091923\\excel\\peaks\\"
+database_path = "A:\\files\\ChenWWTP\\091923\\excel\\fitting\\database\\Database.xlsx"  # Replace with the path to your database
+output_folder = "A:\\files\\ChenWWTP\\091923\\excel\\fitting\\fitting_result\\"
+
+# Make output folder if it doesn't exist
+os.makedirs(output_folder, exist_ok=True)
+
+# Read the database into a DataFrame
+db = pd.read_excel(database_path)
+
+# Loop through all Excel files in the peaks folder
+for peak_file in os.listdir(peaks_folder):
+    if peak_file.endswith('.xlsx'):
+        peak_path = os.path.join(peaks_folder, peak_file)
+        
+        # Read the peak data
+        peak_df = pd.read_excel(peak_path)
+        
+        # List to store matching peaks data as dictionaries
+        matching_peaks_list = []
+        
+        # Loop through the database and the detected peaks to find matches
+        for i, db_row in db.iterrows():
+            for j, peak_row in peak_df.iterrows():
+                ppm = calculate_ppm(db_row['Anion_Mass'], peak_row['Peak Mass (Gaussian)'])
+                
+                if ppm < 5:  # Matching condition
+                    matching_peaks_list.append({
+                        'Name': db_row['Name'],
+                        'Formula': db_row['Formula'],
+                        'Theoretical Anion_Mass': db_row['Anion_Mass'],
+                        'Detected Anion_Mass': peak_row['Peak Mass (Gaussian)'],
+                        'Intensity': peak_row['Peak Intensity (Gaussian)'],
+                        'PPM': ppm
+                    })
+
+        # Convert list of dictionaries to DataFrame
+        matching_peaks = pd.DataFrame(matching_peaks_list)
+        
+        # Save the matching peaks to a new Excel file
+        output_file_name = "fitting_" + peak_file  # Append 'fitting_' to original file name
+        output_file_path = os.path.join(output_folder, output_file_name)
+        
+        matching_peaks.to_excel(output_file_path, index=False)
+
+
