@@ -1,0 +1,57 @@
+import pandas as pd
+import numpy as np
+from scipy.optimize import curve_fit
+from scipy.signal import find_peaks
+import os
+
+def gaussian(x, amp, mu, sigma):
+    return amp * np.exp(-(x - mu)**2 / (2 * sigma**2))
+
+source_folder = "A:\\files\\ChenWWTP\\091923\\excel\\"
+output_folder = "A:\\files\\ChenWWTP\\091923\\excel\\peaks\\"
+
+os.makedirs(output_folder, exist_ok=True)
+
+excel_files = [f for f in os.listdir(source_folder) if f.endswith('.xlsx')]
+
+for excel_file in excel_files:
+    input_file_path = os.path.join(source_folder, excel_file)
+    
+    df = pd.read_excel(input_file_path, skiprows=7)
+    mass = df['Mass'].values
+    intensity = df['Intensity'].values
+    
+    preliminary_peaks, _ = find_peaks(intensity, distance=5, height=10)
+    
+    peak_masses = []
+    peak_intensities = []
+    
+    window_size = 5
+    
+    for peak in preliminary_peaks:
+        lower_bound = max(0, peak - window_size)
+        upper_bound = min(len(mass), peak + window_size)
+        
+        x_data = mass[lower_bound:upper_bound]
+        y_data = intensity[lower_bound:upper_bound]
+        
+        initial_guess = [max(y_data), np.mean(x_data), np.std(x_data)]
+        
+        try:
+            popt, _ = curve_fit(gaussian, x_data, y_data, p0=initial_guess)
+        except Exception as e:
+            print(f"Failed to fit Gaussian near x = {np.mean(x_data)}. Error: {e}")
+            continue
+        
+        peak_masses.append(popt[1])
+        peak_intensities.append(popt[0])
+    
+    output_file_name = "peaks_" + excel_file  # Append 'peaks_' to original file name
+    output_file_path = os.path.join(output_folder, output_file_name)
+    
+    df_peaks = pd.DataFrame({
+        'Peak Mass (Gaussian)': peak_masses,
+        'Peak Intensity (Gaussian)': peak_intensities
+    })
+    
+    df_peaks.to_excel(output_file_path, index=False)
