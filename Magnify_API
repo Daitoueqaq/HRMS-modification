@@ -1,0 +1,133 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+datapoints = [
+]
+base_url = 'https://www.ebi.ac.uk/metagenomics/studies/'
+identifiers = {}
+for datapoint in datapoints:
+    url = f"{base_url}{datapoint}"
+    driver.get(url)
+    # Wait for possible redirects to complete
+    driver.implicitly_wait(10)  # waits up to 10 seconds
+    final_url = driver.current_url
+    print("Final redirected URL:", final_url)
+    study_id = final_url.split('/')[-1].split('#')[0]
+    identifiers[datapoint] = study_id
+
+driver.quit()
+print(identifiers)
+
+####
+####
+
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+
+file_path = 'A:/files/RHA1paper/metage/mca_mtb.xlsx'  # Replace with your file path
+data = pd.read_excel(file_path, engine='openpyxl')
+columns_to_fill = ['Row', 'Target', 'Studies', 'Assemblies', 'Pfam matches', 'Kingdom', 'Known Structure', 'Identical Seqs', '# hits', '# significant hits', 'Bit Score', 'Hit Positions', 'Full length', 'E-value']
+data[columns_to_fill] = data[columns_to_fill].ffill()
+data['Studies'] = data.groupby('Row')['Studies'].transform(lambda x: ', '.join(x.dropna().unique()))
+data['Assemblies'] = data.groupby('Row')['Assemblies'].transform(lambda x: ', '.join(x.dropna().unique()))
+data['Pfam matches'] = data.groupby('Row')['Pfam matches'].transform(lambda x: ', '.join(x.dropna().unique()))
+data = data.drop_duplicates(subset='Row')
+data.reset_index(drop=True, inplace=True)
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service)
+
+base_url = 'https://www.ebi.ac.uk/metagenomics/studies/'
+study_numbers = []
+
+for studies in data['Studies']:
+    if pd.notna(studies):
+        individual_studies = studies.split(', ')
+        numbers = []
+        for study in individual_studies:
+            url = f"{base_url}{study.strip()}"
+            driver.get(url)
+            time.sleep(7)  # Time for potential redirects
+            final_url = driver.current_url
+            study_id = final_url.split('/')[-1].split('#')[0]
+            numbers.append(study_id)
+        study_numbers.append(', '.join(numbers))
+    else:
+        study_numbers.append(None)
+
+driver.quit()
+
+data['Study Number'] = study_numbers
+data.to_excel('A:/files/RHA1paper/metage/processed_mca_mst.xlsx', index=False)
+
+####
+####
+
+import pandas as pd
+file_path = 'A:/files/RHA1paper/metage/processed_mca_mst.xlsx'  # Replace with your file path
+data = pd.read_excel(file_path, engine='openpyxl')
+data['Studies'] = data['Studies'].astype(str)
+data['Study Number'] = data['Study Number'].astype(str)
+data['Studies'] = data['Studies'].str.split(', ')
+data['Study Number'] = data['Study Number'].str.split(', ')
+exploded_data = data.explode('Studies').explode('Study Number')
+assert len(exploded_data['Studies']) == len(exploded_data['Study Number']), "Mismatch in exploded data lengths."
+studies_count = exploded_data['Studies'].value_counts().reset_index()
+studies_count.columns = ['Studies', 'Count']
+study_number_count = exploded_data['Study Number'].value_counts().reset_index()
+study_number_count.columns = ['Study Number', 'Count']
+merged_counts = pd.merge(studies_count, study_number_count, left_index=True, right_index=True, how='outer')
+
+output_file_path = 'A:/files/RHA1paper/metage/studies_and_study_number_count-2.xlsx'
+merged_counts.to_excel(output_file_path, index=False)
+
+
+####
+####
+
+import requests
+import pandas as pd
+file_path = 'A:/files/RHA1paper/metage/processed_mca_mst.xlsx'
+data = pd.read_excel(file_path)
+study_numbers = data['Study Number'].dropna().unique()
+
+base_url = 'https://www.ebi.ac.uk/metagenomics/api/v1/studies/'
+
+study_details = []
+for study in study_numbers:
+    # Fetch general study details to get the biome ID
+    study_response = requests.get(f"{base_url}{study}")
+    if study_response.status_code == 200:
+        study_data = study_response.json().get('data', {})
+        biome_id = study_data['relationships']['biomes']['data'][0]['id'] if study_data['relationships']['biomes']['data'] else 'No biome data'
+        
+        # Fetch geocoordinates for the study
+        geo_response = requests.get(f"{base_url}{study}/geocoordinates")
+        if geo_response.status_code == 200:
+            geo_data = geo_response.json().get('data', [])
+            if geo_data:  # Check if there is geo data available
+                for item in geo_data:
+                    study_details.append({
+                        'Study Number': study,
+                        'Biome ID': biome_id,
+                        'Longitude': item['attributes']['longitude'],
+                        'Latitude': item['attributes']['latitude']
+                    })
+            else:
+                study_details.append({
+                    'Study Number': study,
+                    'Biome ID': biome_id,
+                    'Longitude': 'No data',
+                    'Latitude': 'No data'
+                })
+        else:
+            print(f"Geo data fetch failed for {study}. Status Code: {geo_response.status_code}")
+    else:
+        print(f"Study details fetch failed for {study}. Status Code: {study_response.status_code}")
+
+details_df = pd.DataFrame(study_details)
+output_file_path = 'A:/files/RHA1paper/metage/complete_study_details_Mca_H37Rv.xlsx'
+details_df.to_excel(output_file_path, index=False)
