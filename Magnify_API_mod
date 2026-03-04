@@ -1,0 +1,188 @@
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+
+file_path = 'A:/files/RHA1paper/metage/mca_mtb.xlsx'
+data = pd.read_excel(file_path, engine='openpyxl')
+data['Studies'] = data['Studies'].apply(lambda x: ', '.join(set(x.split(', '))) if pd.notnull(x) else x)
+data = data.drop_duplicates(subset=['Studies'])
+data.reset_index(drop=True, inplace=True)
+data.to_excel('A:/files/RHA1paper/metage/mca_mtb_removreplica.xlsx', index=False)
+
+####
+####
+
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service)
+
+base_url = 'https://www.ebi.ac.uk/metagenomics/studies/'
+study_numbers = []
+
+for studies in data['Studies']:
+    if pd.notna(studies):
+        individual_studies = studies.split(', ')
+        numbers = []
+        for study in individual_studies:
+            url = f"{base_url}{study.strip()}"
+            driver.get(url)
+            time.sleep(7)
+            final_url = driver.current_url
+            study_id = final_url.split('/')[-1].split('#')[0]
+            if study_id not in numbers:
+                numbers.append(study_id)
+        study_numbers.append(', '.join(numbers))
+    else:
+        study_numbers.append(None)
+
+driver.quit()
+
+data['Study Number'] = study_numbers
+data.to_excel('A:/files/RHA1paper/metage/processed_mca_mst.xlsx', index=False)
+print(data.head())
+
+####
+####
+
+import pandas as pd
+import requests
+
+file_path = 'A:/files/RHA1paper/metage/wwtp_ori.xlsx'
+data = pd.read_excel(file_path)
+data['Sample'] = data['Sample'].apply(lambda x: ', '.join(set(x.split())) if pd.notnull(x) else x)
+data = data.drop_duplicates(subset=['Sample'])
+data.reset_index(drop=True, inplace=True)
+
+base_url = 'https://www.ebi.ac.uk/metagenomics/api/v1/samples/'
+
+for index, row in data.iterrows():
+    if pd.notna(row['Sample']):
+        samples = row['Sample'].split(', ')
+        for sample in samples:
+            response = requests.get(f"{base_url}{sample.strip()}")
+            if response.status_code == 200:
+                sample_data = response.json().get('data', {}).get('attributes', {})
+                # Add longitude and latitude directly to the dataframe
+                data.loc[index, 'Longitude'] = sample_data.get('longitude')
+                data.loc[index, 'Latitude'] = sample_data.get('latitude')
+            else:
+                print(f"Failed to fetch data for {sample}. Status Code: {response.status_code}")
+                data.loc[index, 'Longitude'] = 'No data'
+                data.loc[index, 'Latitude'] = 'No data'
+
+output_file_path = 'A:/files/RHA1paper/metage/processed_wwtp_ori.xlsx'
+data.to_excel(output_file_path, index=False)
+
+####
+####
+
+import pandas as pd
+import requests
+
+file_path = 'A:/files/RHA1paper/metage/new_hits.xlsx'
+data = pd.read_excel(file_path)
+data['Sample'] = data['Sample'].apply(lambda x: ', '.join(set(x.split())) if pd.notnull(x) else x)
+data = data.drop_duplicates(subset=['Sample'])
+data.reset_index(drop=True, inplace=True)
+
+base_url = 'https://www.ebi.ac.uk/metagenomics/api/v1/samples/'
+
+for index, row in data.iterrows():
+    if pd.notna(row['Sample']):
+        samples = row['Sample'].split(', ')
+        for sample in samples:
+            response = requests.get(f"{base_url}{sample.strip()}")
+            if response.status_code == 200:
+                sample_data = response.json().get('data', {}).get('attributes', {})
+                data.at[index, 'Longitude'] = sample_data.get('longitude')
+                data.at[index, 'Latitude'] = sample_data.get('latitude')
+            else:
+                print(f"Failed to fetch data for {sample}. Status Code: {response.status_code}")
+                data.at[index, 'Longitude'] = 'No data'
+                data.at[index, 'Latitude'] = 'No data'
+
+output_file_path = 'A:/files/RHA1paper/metage/new_hits_location.xlsx'
+data.to_excel(output_file_path, index=False)
+
+####
+####
+
+import re
+input_file = 'C:/Users/boyua/Downloads/seq_mod.fasta'
+output_file = 'C:/Users/boyua/Downloads/output_seq_mod.fasta'
+
+with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
+    for line in infile:
+        if line.startswith('>'):
+            match = re.search(r'\[(.*?)\]', line)
+            if match:
+                organism = match.group(1)
+                # Replace spaces with underscores in the organism name
+                organism = organism.replace(' ', '_')
+                # Write the formatted header line with '>' to the output file
+                outfile.write(f'>{organism}\n')
+            else:
+                outfile.write(line)
+        else:
+            outfile.write(line)
+
+####
+####
+
+import pandas as pd
+import requests
+import time
+from tqdm import tqdm  # Import tqdm for the progress bar
+
+evalue_threshold = 1e-5
+
+input_csv = 'A:/files/RHA1paper/metage/hmmsearch/hmmsearch_results.csv'
+data = pd.read_csv(input_csv)
+
+data['Sample_ID'] = ''
+data['Study_ID'] = ''
+data['Longitude'] = ''
+data['Latitude'] = ''
+data['Geographic_Location'] = ''
+
+runs_base_url = 'https://www.ebi.ac.uk/metagenomics/api/v1/runs/'
+samples_base_url = 'https://www.ebi.ac.uk/metagenomics/api/v1/samples/'
+
+for index, row in tqdm(data.iterrows(), total=data.shape[0], desc='Get a cup of coffee'):
+    run_id = row['Sample_Number']  # Assuming 'Sample_Number' column contains run identifiers
+    run_url = f"{runs_base_url}{run_id}"
+    try:
+        run_response = requests.get(run_url)
+        if run_response.status_code == 200:
+            run_data = run_response.json().get('data', {})
+            # Extract sample identifier
+            sample_relationship = run_data.get('relationships', {}).get('sample', {}).get('data', {})
+            sample_id = sample_relationship.get('id', '')
+            data.at[index, 'Sample_ID'] = sample_id
+            # Extract study identifier
+            study_relationship = run_data.get('relationships', {}).get('study', {}).get('data', {})
+            study_id = study_relationship.get('id', '')
+            data.at[index, 'Study_ID'] = study_id
+
+            sample_url = f"{samples_base_url}{sample_id}"
+            sample_response = requests.get(sample_url)
+            if sample_response.status_code == 200:
+                sample_attributes = sample_response.json().get('data', {}).get('attributes', {})
+                # Extract longitude, latitude, and geographic location
+                longitude = sample_attributes.get('longitude', '')
+                latitude = sample_attributes.get('latitude', '')
+                geo_loc_name = sample_attributes.get('geo-loc-name', '')
+                data.at[index, 'Longitude'] = longitude
+                data.at[index, 'Latitude'] = latitude
+                data.at[index, 'Geographic_Location'] = geo_loc_name
+            else:
+                print(f"\nFailed to fetch sample data for {sample_id}. Status Code: {sample_response.status_code}")
+        else:
+            print(f"\nFailed to fetch run data for {run_id}. Status Code: {run_response.status_code}")
+    except Exception as e:
+        print(f"\nAn error occurred while processing run {run_id}: {e}")
+    time.sleep(0.1)  # Pause for 0.1 seconds between requests
+
+output_csv = 'hmmsearch_results_with_location.csv'
+data.to_csv(output_csv, index=False)
