@@ -186,3 +186,134 @@ for index, row in tqdm(data.iterrows(), total=data.shape[0], desc='Get a cup of 
 
 output_csv = 'hmmsearch_results_with_location.csv'
 data.to_csv(output_csv, index=False)
+
+####
+####
+
+import pandas as pd
+import os
+import re
+
+TBL_FILES_DIRECTORY = "A:/files/RHA1paper/worldmap/result"
+METADATA_FILE_PATH = "A:/files/RHA1paper/worldmap/zzz_final_aq_data_all_merged.xlsx" # Updated to .xlsx
+OUTPUT_CSV_PATH = "A:/files/RHA1paper/worldmap/summary_0.csv"
+AGGREGATED_OUTPUT_CSV_PATH = "A:/files/RHA1paper/worldmap/summary_1.csv" # New file for the final summary
+
+E_VALUE_THRESHOLD = 5e-4
+
+def extract_run_id_from_filename(filename):
+    match = re.match(r'(ERR\d+|SRR\d+|SRS\d+)', filename)
+    if match:
+        return match.group(1)
+    return None
+
+def process_tbl_file(filepath, threshold):
+    try:
+        col_names = [
+            'target_name', 'target_accession', 'query_name', 'query_accession',
+            'evalue_full', 'score_full', 'bias_full',
+            'evalue_best_domain', 'score_best_domain', 'bias_best_domain',
+            'exp', 'reg', 'clu', 'ov', 'env', 'dom', 'rep', 'inc', 'description'
+        ]
+
+        df = pd.read_csv(
+            filepath,
+            comment='#',
+            header=None,
+            sep=r'\s+',  # This handles one or more spaces as a delimiter
+            names=col_names,
+            usecols=['target_name', 'evalue_full'], # Only load necessary columns for efficiency
+            engine='python' # More robust engine for regex separators
+        )
+
+        df['evalue_full'] = pd.to_numeric(df['evalue_full'], errors='coerce')
+        significant_hits = df[df['evalue_full'] <= threshold]
+        return len(significant_hits)
+    except (FileNotFoundError, pd.errors.EmptyDataError):
+        return 0
+    except Exception as e:
+        print(f"  - Could not process file {os.path.basename(filepath)} due to an error: {e}")
+        return 0
+
+print("--- Starting HMMER Hit Analysis ---")
+
+metadata_df = None
+try:
+    print(f"Loading metadata from: {METADATA_FILE_PATH}")
+    metadata_df = pd.read_excel(METADATA_FILE_PATH)
+    metadata_df.dropna(subset=['run_id'], inplace=True)
+    metadata_df.set_index('run_id', inplace=True)
+    print(f"Successfully loaded {len(metadata_df)} metadata records.")
+except FileNotFoundError:
+    print(f"ERROR: Metadata file not found at '{METADATA_FILE_PATH}'. Please check the path.")
+except KeyError:
+    print("ERROR: The metadata Excel file does not contain a 'run_id' column. Please check the file.")
+except Exception as e:
+    print(f"An unexpected error occurred while loading metadata: {e}")
+
+if metadata_df is not None:
+    results_list = []
+    print(f"\nProcessing .tbl files from: {TBL_FILES_DIRECTORY}")
+    if not os.path.exists(TBL_FILES_DIRECTORY):
+        print(f"ERROR: TBL files directory not found at '{TBL_FILES_DIRECTORY}'. Please check the path.")
+    else:
+        all_files = os.listdir(TBL_FILES_DIRECTORY)
+        tbl_files = [f for f in all_files if f.endswith('.tbl')]
+        if not tbl_files:
+            print("No .tbl files found in the specified directory.")
+        else:
+            print(f"Found {len(tbl_files)} .tbl files to process.")
+            processed_count = 0
+            for filename in tbl_files:
+                run_id = extract_run_id_from_filename(filename)
+                if not run_id:
+                    continue
+                full_path = os.path.join(TBL_FILES_DIRECTORY, filename)
+                hit_count = process_tbl_file(full_path, E_VALUE_THRESHOLD)
+                try:
+                    if run_id in metadata_df.index:
+                        geo_info = metadata_df.loc[run_id]
+                        if isinstance(geo_info, pd.DataFrame):
+                            geo_info = geo_info.iloc[0]
+                        results_list.append({
+                            'run_id': run_id,
+                            'significant_hit_count': hit_count,
+                            'latitude': geo_info.get('latitude'),
+                            'longitude': geo_info.get('longitude'),
+                            'geo_location_name': geo_info.get('geo_location_name'),
+                            'environment_biome': geo_info.get('environment_biome')
+                        })
+                    processed_count += 1
+                    if processed_count % 500 == 0:
+                        print(f"  ... processed {processed_count}/{len(tbl_files)} files ...")
+                except Exception as e:
+                    print(f"  - An error occurred during lookup for run_id '{run_id}': {e}")
+            print(f"\nFinished processing. Matched {len(results_list)} records with metadata.")
+            if results_list:
+                final_df = pd.DataFrame(results_list)
+                final_df.to_csv(OUTPUT_CSV_PATH, index=False)
+                print(f"\nSuccessfully created the summary file at: {OUTPUT_CSV_PATH}")
+                print("\n--- Aggregating results by geographic location ---")
+                try:
+                    final_df.dropna(subset=['latitude', 'longitude'], inplace=True)
+                    final_df['lat_rounded'] = final_df['latitude'].round(3)
+                    final_df['lon_rounded'] = final_df['longitude'].round(3)
+                    aggregation_rules = {
+                        'significant_hit_count': 'sum',
+                        'geo_location_name': 'first',
+                        'environment_biome': 'first' 
+                    }
+                    aggregated_df = final_df.groupby(['lat_rounded', 'lon_rounded']).agg(aggregation_rules).reset_index()
+                    aggregated_df.rename(columns={'lat_rounded': 'latitude', 'lon_rounded': 'longitude'}, inplace=True)
+                    aggregated_df = aggregated_df[['latitude', 'longitude', 'significant_hit_count', 'geo_location_name', 'environment_biome']]
+                    aggregated_df.to_csv(AGGREGATED_OUTPUT_CSV_PATH, index=False)
+                    print(f"Successfully created the aggregated summary file at: {AGGREGATED_OUTPUT_CSV_PATH}")
+                    print(f"Found {len(aggregated_df)} unique locations.")
+                except Exception as e:
+                    print(f"An error occurred during the aggregation step: {e}")
+            else:
+                print("\nNo results were generated. The output file was not created.")
+else:
+    print("\nExecution stopped because the metadata file could not be loaded.")
+
+print("--- Analysis Complete ---")
